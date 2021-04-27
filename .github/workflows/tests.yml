@@ -32,5 +32,5 @@ jobs:
           python -m pip install -e ".[test]"
 
       - run: |
-        unladen --version
-        unladen --verbose
+          unladen --version
+          unladen --verbose
