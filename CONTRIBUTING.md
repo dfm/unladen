@@ -1,9 +1,9 @@
-## Contributing to ladv
+## Contributing to unladen
 
 ### Reporting issues
 
-If you find a bug or other unexpected behavior while using `ladv`,
-open an issue on the [GitHub repository](https://github.com/dfm/ladv/issues)
+If you find a bug or other unexpected behavior while using `unladen`,
+open an issue on the [GitHub repository](https://github.com/dfm/unladen/issues)
 and we will try to respond and (hopefully) solve the problem in a timely manner.
 Similarly, if you have a feature request or question about the library, the best
 place to post those is currently on GitHub as an issue, but that is likely
