@@ -44,7 +44,7 @@ if __name__ == "__main__":
         package_dir={"": "src"},
         package_data={"unladen": ["py.typed"]},
         include_package_data=True,
-        python_requires=">=3.6",
+        python_requires=">=3.7",
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRA_REQUIRE,
         classifiers=CLASSIFIERS,
