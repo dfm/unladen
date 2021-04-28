@@ -3,16 +3,17 @@
 __all__ = ["main"]
 
 import shutil
-import subprocess
 import tempfile
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 import click
 
+from . import git
+from .config import read_pyproject_toml
 from .unladen_version import version as __version__
 
 
@@ -88,7 +89,7 @@ err = partial(click.secho, bold=True, fg="red", err=True)
     show_default=True,
 )
 @click.option(
-    "--git",
+    "--git-path",
     type=str,
     default="git",
     help="Path to the correct git executable.",
@@ -102,6 +103,22 @@ err = partial(click.secho, bold=True, fg="red", err=True)
         file_okay=False,
         dir_okay=True,
     ),
+    required=False,
+    is_eager=True,
+)
+@click.option(
+    "--config",
+    type=click.Path(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=False,
+        path_type=str,
+    ),
+    is_eager=True,
+    callback=read_pyproject_toml,
+    help="Read configuration from FILE path.",
 )
 @click.pass_context
 def main(
@@ -115,45 +132,57 @@ def main(
     force: bool,
     name: str,
     email: str,
-    git: str,
-    source: str,
+    git_path: str,
+    source: Optional[str],
+    config: Optional[str],
 ) -> None:
     if repo and target:
-        err("Only one of 'repo' and 'target' can be specified")
-        ctx.exit(1)
+        raise click.BadOptionUsage(
+            "repo", "Only one of 'repo' and 'target' can be specified"
+        )
     if not (repo or target):
-        err("Either 'repo' or 'target' must be specified")
-        ctx.exit(1)
+        raise click.BadOptionUsage(
+            "repo", "Either 'repo' or 'target' must be specified"
+        )
+    if not source:
+        raise click.BadOptionUsage(
+            "source", "Missing required parameter 'source'"
+        )
 
     source_dir = Path(source).resolve()
 
     # First get and parse the git ref
     if not ref:
-        ref = get_ref(ctx=ctx, source=source_dir, git=git, verbose=verbose)
+        ref = git.get_ref(
+            ctx=ctx, source=source_dir, git=git_path, verbose=verbose
+        )
     parsed_ref = parse_ref(ctx=ctx, ref=ref, verbose=verbose)
     if not parsed_ref.name:
-        err(f"Invalid ref: '{ref}'")
-        ctx.exit(1)
+        raise click.BadOptionUsage(
+            "ref", f"The provided or inferred git ref is invalid: {ref}"
+        )
     if verbose:
         out(f"Using git ref: '{parsed_ref.name}' (parsed from '{ref}')")
 
     # Get the git SHA
     if not sha:
-        sha = get_sha(ctx=ctx, source=source_dir, git=git, verbose=verbose)
+        sha = git.get_sha(
+            ctx=ctx, source=source_dir, git=git_path, verbose=verbose
+        )
     if verbose and sha:
         out(f"Current git SHA: '{sha}'")
 
     if repo:
         with tempfile.TemporaryDirectory() as temp_dir:
             target_dir = Path(temp_dir)
-            checkout_or_init_repo(
+            git.checkout_or_init_repo(
                 ctx=ctx,
                 repo=repo,
                 branch=branch,
                 cwd=target_dir,
                 name=name,
                 email=email,
-                git=git,
+                git=git_path,
                 verbose=verbose,
             )
             copy_source_to_target(
@@ -163,14 +192,14 @@ def main(
                 ref=parsed_ref,
                 verbose=verbose,
             )
-            push_to_repo(
+            git.push_to_repo(
                 ctx=ctx,
                 repo=repo,
                 branch=branch,
                 cwd=target_dir,
                 sha=sha,
                 force=force,
-                git=git,
+                git=git_path,
                 verbose=verbose,
             )
 
@@ -186,84 +215,6 @@ def main(
         )
 
 
-def format_command_output(message: bytes) -> str:
-    return "\n".join(
-        f"  > {line}" for line in message.decode("utf-8").strip().splitlines()
-    )
-
-
-def exec_git(
-    args: Iterable[str],
-    *,
-    ctx: click.Context,
-    git: str,
-    cwd: Optional[Path] = None,
-    check: bool = True,
-    verbose: bool = False,
-) -> "subprocess.CompletedProcess[bytes]":
-    all_args = [git] + list(args)
-    proc = subprocess.run(all_args, cwd=cwd, capture_output=True)
-    if verbose:
-        msg = f"Running '{' '.join(all_args)}':\n"
-        msg += format_command_output(proc.stdout)
-        out(msg)
-    if (verbose or check) and proc.returncode:
-        msg = f"Command '{' '.join(all_args)}' failed with message:\n"
-        msg += format_command_output(proc.stderr)
-        err(msg)
-        if check:
-            ctx.exit(1)
-    return proc
-
-
-def get_sha(
-    *,
-    ctx: click.Context,
-    source: Path,
-    git: str,
-    verbose: bool = False,
-) -> Optional[str]:
-    proc = exec_git(
-        ["rev-parse", "--short", "HEAD"],
-        ctx=ctx,
-        git=git,
-        cwd=source,
-        check=False,
-        verbose=verbose,
-    )
-    return proc.stdout.decode("utf-8").strip()
-
-
-def get_ref(
-    *,
-    ctx: click.Context,
-    source: Path,
-    git: str,
-    verbose: bool = False,
-) -> str:
-    proc = exec_git(
-        ["symbolic-ref", "-q", "HEAD"],
-        ctx=ctx,
-        git=git,
-        cwd=source,
-        check=False,
-        verbose=verbose,
-    )
-    if proc.returncode:
-        proc = exec_git(
-            ["describe", "--tags", "--exact-match"],
-            ctx=ctx,
-            git=git,
-            cwd=source,
-            check=False,
-            verbose=verbose,
-        )
-        if proc.returncode:
-            err("Couldn't infer the git ref; make sure you're in a git repo!")
-            ctx.exit(1)
-    return proc.stdout.decode("utf-8").strip()
-
-
 def parse_ref(
     *, ctx: click.Context, ref: str, verbose: bool = False
 ) -> RefInfo:
@@ -274,70 +225,6 @@ def parse_ref(
     if verbose:
         err(f"Unrecognized ref format: {ref}")
     return RefInfo(name=slugify(ref), kind=RefKind.UNKNOWN)
-
-
-def checkout_or_init_repo(
-    *,
-    ctx: click.Context,
-    repo: str,
-    branch: str,
-    cwd: Path,
-    name: str,
-    email: str,
-    git: str,
-    verbose: bool = False,
-) -> None:
-    run = partial(
-        exec_git, ctx=ctx, cwd=cwd, git=git, verbose=verbose, check=True
-    )
-
-    # Initialize the repo and fetch from the remote
-    run(["init"])
-    run(["remote", "add", "upstream", repo])
-    run(["config", "user.name", name])
-    run(["config", "user.email", email])
-    run(["fetch", "upstream"])
-
-    # Either checkout the right branch or create it
-    proc = run(["checkout", "-b", branch, f"upstream/{branch}"], check=False)
-    if proc.returncode:
-        if verbose:
-            out(f"Checkout of {branch} failed; creating it fresh")
-        run(["checkout", "--orphan", branch])
-        run(["commit", "--allow-empty", "-m", '"Initial empty commit"'])
-
-
-def push_to_repo(
-    *,
-    ctx: click.Context,
-    repo: str,
-    branch: str,
-    cwd: Path,
-    sha: Optional[str],
-    force: bool,
-    git: str,
-    verbose: bool = False,
-) -> None:
-    run = partial(
-        exec_git, ctx=ctx, cwd=cwd, git=git, verbose=verbose, check=True
-    )
-    run(["add", "-A", "."])
-
-    # Check to see if there were any changes
-    proc = run(["diff", "--cached", "--exit-code"], check=False)
-    if proc.returncode == 0:
-        if verbose:
-            out("Documentation is unchanged; skipping push")
-        return
-
-    msg = f"deploy {sha}" if sha else "deploy docs"
-    msg = f'"{msg}"'
-    if force:
-        run(["commit", "--amend", "--date=now", "-m", msg])
-        run(["push", "-fq", "upstream", f"HEAD:{branch}"])
-    else:
-        run(["commit", "-m", msg], check=True)
-        run(["push", "-q", "upstream", f"HEAD:{branch}"])
 
 
 def copy_source_to_target(
