@@ -134,10 +134,6 @@ def main(
         raise click.BadOptionUsage(
             "source", "Missing required parameter 'source'"
         )
-    if repo and target:
-        raise click.BadOptionUsage(
-            "repo", "Only one of 'repo' and 'target' can be specified"
-        )
     if not (repo or target):
         raise click.BadOptionUsage(
             "repo", "Either 'repo' or 'target' must be specified"
@@ -168,7 +164,18 @@ def main(
     if verbose and sha:
         click.secho(f"Current git SHA: '{sha}'")
 
-    if repo:
+    if target:
+        target_dir = Path(target).resolve()
+        copy_source_to_target(
+            ctx=ctx,
+            source=source_dir,
+            target=target_dir,
+            ref=parsed_ref,
+            verbose=verbose,
+        )
+
+    else:
+        assert repo is not None
         with tempfile.TemporaryDirectory() as temp_dir:
             target_dir = Path(temp_dir)
             git.checkout_or_init_repo(
@@ -198,17 +205,6 @@ def main(
                 git=git_path,
                 verbose=verbose,
             )
-
-    else:
-        assert target is not None
-        target_dir = Path(target).resolve()
-        copy_source_to_target(
-            ctx=ctx,
-            source=source_dir,
-            target=target_dir,
-            ref=parsed_ref,
-            verbose=verbose,
-        )
 
 
 def parse_ref(
