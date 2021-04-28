@@ -16,7 +16,7 @@ def make_test_docs() -> Path:
     return path
 
 
-def check_test_docs(path: Path, ref: str, branch: str = None) -> bool:
+def check_test_docs(path: Path, ref: str, branch: str = None) -> None:
     if branch:
         subprocess.run(["git", "checkout", branch], cwd=path, check=True)
     assert (path / ref / "index.html").exists()
@@ -122,5 +122,5 @@ def test_fresh_repo():
         )
         if result.exit_code:
             print(result.output)
-        check_test_docs(repo, "main", "gh-pages")
         assert result.exit_code == 0
+        check_test_docs(repo, "main", "gh-pages")

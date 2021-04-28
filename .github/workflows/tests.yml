@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
 
     steps:
       - uses: actions/checkout@v2
@@ -29,8 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          python -m pip install -e ".[test]"
+          python -m pip install -e tox tox-gh-actions
 
-      - name: Tests
-        run: |
-          python -m pytest -v tests
+      - name: Run tests using tox
+        run: python -m tox

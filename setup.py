@@ -18,6 +18,7 @@ INSTALL_REQUIRES = ["beautifulsoup4", "click"]
 EXTRA_REQUIRE = {
     "docs": ["sphinx>=1.7.5", "myst-nb"],
     "test": ["pytest"],
+    "lint": ["mypy", "pre-commit"],
 }
 
 
