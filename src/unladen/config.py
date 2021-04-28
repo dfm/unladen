@@ -5,21 +5,21 @@ Utilities for working with configuration files and click based on the
 implementation from psf/black
 """
 
-__all__ = ["find_project_root", "read_pyproject_toml"]
+__all__ = ["find_project_root", "read_config_toml"]
 
 import os
 import sys
-from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import click
 import toml
 
+CONFIG_FILENAMES = ["unladen.toml", "pyproject.toml"]
 
-@lru_cache()
+
 def find_project_root(srcs: Tuple[str, ...]) -> Path:
-    """Return a directory containing .git, .hg, or pyproject.toml.
+    """Return a directory containing .git, .hg, or a config file
 
     That directory will be a common parent of all files and directories
     passed in `srcs`.
@@ -51,15 +51,15 @@ def find_project_root(srcs: Tuple[str, ...]) -> Path:
         if (directory / ".hg").is_dir():
             return directory
 
-        if (directory / "pyproject.toml").is_file():
-            return directory
+        for fn in CONFIG_FILENAMES:
+            if (directory / fn).is_file():
+                return directory
 
     return directory
 
 
-@lru_cache()
-def find_user_pyproject_toml() -> Path:
-    r"""Return the path to the top-level user configuration for black.
+def find_user_config_toml() -> Path:
+    r"""Return the path to the top-level user configuration
 
     This looks for ~\.unladen on Windows and ~/.config/unladen on Linux and
     other Unix systems.
@@ -69,22 +69,24 @@ def find_user_pyproject_toml() -> Path:
         user_config_path = Path.home() / ".unladen"
     else:
         config_root = os.environ.get("XDG_CONFIG_HOME", "~/.config")
-        user_config_path = Path(config_root).expanduser() / "unladen"
+        user_config_path = Path(config_root).expanduser() / "unladen.toml"
     return user_config_path.resolve()
 
 
-def find_pyproject_toml(path_search_start: str) -> Optional[str]:
-    """Find the absolute filepath to a pyproject.toml if it exists"""
-    path_project_root = find_project_root(path_search_start)
-    path_pyproject_toml = path_project_root / "pyproject.toml"
-    if path_pyproject_toml.is_file():
-        return str(path_pyproject_toml)
+def find_config_toml(path_search_start: str) -> Optional[str]:
+    """Find the absolute filepath to a config file if it exists"""
+    path_project_root = find_project_root((path_search_start,))
+
+    for fn in CONFIG_FILENAMES:
+        path_toml = path_project_root / fn
+        if path_toml.is_file():
+            return str(path_toml)
 
     try:
-        path_user_pyproject_toml = find_user_pyproject_toml()
+        path_user_config_toml = find_user_config_toml()
         return (
-            str(path_user_pyproject_toml)
-            if path_user_pyproject_toml.is_file()
+            str(path_user_config_toml)
+            if path_user_config_toml.is_file()
             else None
         )
     except PermissionError:
@@ -92,22 +94,22 @@ def find_pyproject_toml(path_search_start: str) -> Optional[str]:
         return None
 
 
-def parse_pyproject_toml(path_config: str) -> Dict[str, Any]:
-    """Parse a pyproject toml file, pulling out relevant parts for unladen
+def parse_config_toml(path_config: str) -> Dict[str, Any]:
+    """Parse a config toml file, pulling out relevant parts for unladen
 
     If parsing fails, will raise a toml.TomlDecodeError
     """
-    pyproject_toml = toml.load(path_config)
-    config = pyproject_toml.get("tool", {}).get("unladen", {})
+    config_toml = toml.load(path_config)
+    config = config_toml.get("tool", {}).get("unladen", {})
     return {
         k.replace("--", "").replace("-", "_"): v for k, v in config.items()
     }
 
 
-def read_pyproject_toml(
+def read_config_toml(
     ctx: click.Context, param: click.Parameter, value: Optional[str]
 ) -> Optional[str]:
-    """Inject configuration from "pyproject.toml" into defaults in `ctx`
+    """Inject configuration from a TOML file into defaults in `ctx`
 
     Returns the path to a successfully found and read configuration file, None
     otherwise.
@@ -116,12 +118,12 @@ def read_pyproject_toml(
         value = ctx.params.get("source", None)
         if value is None:
             return None
-        value = find_pyproject_toml(value)
+        value = find_config_toml(value)
         if value is None:
             return None
 
     try:
-        config = parse_pyproject_toml(value)
+        config = parse_config_toml(value)
     except (toml.TomlDecodeError, OSError) as e:
         raise click.FileError(
             filename=value, hint=f"Error reading configuration file: {e}"

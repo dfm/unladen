@@ -11,8 +11,7 @@ from typing import Optional
 
 import click
 
-from . import git
-from .config import read_pyproject_toml
+from . import config, git
 from .unladen_version import version as __version__
 
 
@@ -112,7 +111,7 @@ class RefInfo:
         path_type=str,
     ),
     is_eager=True,
-    callback=read_pyproject_toml,
+    callback=config.read_config_toml,
     help="Read configuration from FILE path.",
 )
 @click.pass_context
@@ -131,6 +130,10 @@ def main(
     source: Optional[str],
     config: Optional[str],
 ) -> None:
+    if not source:
+        raise click.BadOptionUsage(
+            "source", "Missing required parameter 'source'"
+        )
     if repo and target:
         raise click.BadOptionUsage(
             "repo", "Only one of 'repo' and 'target' can be specified"
@@ -138,10 +141,6 @@ def main(
     if not (repo or target):
         raise click.BadOptionUsage(
             "repo", "Either 'repo' or 'target' must be specified"
-        )
-    if not source:
-        raise click.BadOptionUsage(
-            "source", "Missing required parameter 'source'"
         )
 
     source_dir = Path(source).resolve()

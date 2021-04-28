@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
+import pytest
 from click.testing import CliRunner
 
 from unladen import main
@@ -106,25 +109,66 @@ def test_fresh_repo() -> None:
         check_test_docs(repo, "main", "gh-pages")
 
 
-def test_config() -> None:
+def test_user_config() -> None:
     runner = CliRunner()
     with runner.isolated_filesystem():
         path = make_test_docs()
-        with open("test.toml", "w") as f:
-            f.write(
-                f"""
-[tool.unladen]
-verbose = true
-source = "{path}"
-target = "test"
-ref = "refs/heads/main"
-"""
-            )
-        result = runner.invoke(main, ["--config", "test.toml"])
+        write_config_file(Path("."), "test.toml")
+        result = runner.invoke(main, ["--config", "test.toml", str(path)])
         if result.exit_code:
             print(result.output)
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
+
+
+def test_pyproject_config() -> None:
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        path = make_test_docs()
+        write_config_file(path, "pyproject.toml")
+        result = runner.invoke(main, [str(path)])
+        if result.exit_code:
+            print(result.output)
+        assert result.exit_code == 0
+        check_test_docs(Path("test"), "main")
+
+
+def test_unladen_config() -> None:
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        path = make_test_docs()
+        write_config_file(path, "unladen.toml")
+        result = runner.invoke(main, [str(path)])
+        if result.exit_code:
+            print(result.output)
+        assert result.exit_code == 0
+        check_test_docs(Path("test"), "main")
+
+
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="Skipping global config test on Windows"
+)
+def test_global_config() -> None:
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        cfg = Path.cwd() / "config"
+        cfg.mkdir(parents=True, exist_ok=True)
+        write_config_file(cfg, "unladen.toml")
+
+        old_cfg_home = os.environ.get("XDG_CONFIG_HOME", None)
+        os.environ["XDG_CONFIG_HOME"] = str(cfg)
+
+        path = make_test_docs()
+        result = runner.invoke(main, [str(path)])
+        if result.exit_code:
+            print(result.output)
+        assert result.exit_code == 0
+        check_test_docs(Path("test"), "main")
+
+        if old_cfg_home is None:
+            del os.environ["XDG_CONFIG_HOME"]
+        else:
+            os.environ["XDG_CONFIG_HOME"] = old_cfg_home
 
 
 def make_test_docs() -> Path:
@@ -148,3 +192,15 @@ def check_test_docs(
 def create_git_repo(path: Path) -> None:
     path.mkdir(parents=True)
     subprocess.run(["git", "init"], cwd=path, check=True)
+
+
+def write_config_file(path: Path, name: str) -> None:
+    with open(path / name, "w") as f:
+        f.write(
+            """
+[tool.unladen]
+verbose = true
+target = "test"
+ref = "refs/heads/main"
+"""
+        )
