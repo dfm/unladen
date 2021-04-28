@@ -118,9 +118,11 @@ def main(
         err("💔 Either 'repo' or 'target' must be specified")
         ctx.exit(1)
 
+    source_dir = Path(source).resolve()
+
     # First get and parse the git ref
     if not ref:
-        ref = get_ref(ctx=ctx, verbose=verbose)
+        ref = get_ref(ctx=ctx, source=source_dir, verbose=verbose)
     parsed_ref = parse_ref(ctx=ctx, ref=ref, verbose=verbose)
     if not parsed_ref.name:
         err(f"💔 Invalid ref: '{ref}'")
@@ -130,12 +132,9 @@ def main(
 
     # Get the git SHA
     if not sha:
-        sha = get_sha(ctx=ctx, verbose=verbose)
+        sha = get_sha(ctx=ctx, source=source_dir, verbose=verbose)
     if verbose and sha:
         out(f"Current git SHA: '{sha}'")
-
-    # Copy files
-    source_dir = Path(source).resolve()
 
     if repo:
         author = f"{name} <{email}>"
@@ -179,9 +178,14 @@ def main(
         )
 
 
-def get_sha(*, ctx: click.Context, verbose: bool = False) -> Optional[str]:
+def get_sha(
+    *, ctx: click.Context, source: Path, verbose: bool = False
+) -> Optional[str]:
     proc = subprocess.run(
-        "git rev-parse --short HEAD", shell=True, capture_output=True
+        "git rev-parse --short HEAD",
+        shell=True,
+        cwd=source,
+        capture_output=True,
     )
     if proc.returncode:
         err("💔 Couldn't get git SHA; make sure you're in a git repo!")
@@ -189,12 +193,13 @@ def get_sha(*, ctx: click.Context, verbose: bool = False) -> Optional[str]:
     return proc.stdout.decode("utf-8").strip()
 
 
-def get_ref(*, ctx: click.Context, verbose: bool = False) -> str:
+def get_ref(*, ctx: click.Context, source: Path, verbose: bool = False) -> str:
     ref = os.environ.get("GITHUB_REF", "").strip()
     if not ref:
         proc = subprocess.run(
             "git symbolic-ref -q HEAD || git describe --tags --exact-match",
             shell=True,
+            cwd=source,
             capture_output=True,
         )
         if proc.returncode:
