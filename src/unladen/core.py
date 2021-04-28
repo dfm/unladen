@@ -4,27 +4,13 @@ __all__ = ["main"]
 
 import shutil
 import tempfile
-from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 from typing import Optional
 
 import click
 
-from . import config, git
+from . import config, git, refs
 from .unladen_version import version as __version__
-
-
-class RefKind(Enum):
-    UNKNOWN = 0
-    TAG = 1
-    BRANCH = 2
-
-
-@dataclass
-class RefInfo:
-    name: str
-    kind: RefKind
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -146,15 +132,13 @@ def main(
         ref = git.get_ref(
             ctx=ctx, source=source_dir, git=git_path, verbose=verbose
         )
-    parsed_ref = parse_ref(ctx=ctx, ref=ref, verbose=verbose)
-    if not parsed_ref.name:
+    parsed_ref = refs.parse_ref(ref=ref, verbose=verbose)
+    if not parsed_ref:
         raise click.BadOptionUsage(
             "ref", f"The provided or inferred git ref is invalid: {ref}"
         )
     if verbose:
-        click.secho(
-            f"Using git ref: '{parsed_ref.name}' (parsed from '{ref}')"
-        )
+        click.secho(f"Using git ref: '{parsed_ref}' (parsed from '{ref}')")
 
     # Get the git SHA
     if not sha:
@@ -207,28 +191,16 @@ def main(
             )
 
 
-def parse_ref(
-    *, ctx: click.Context, ref: str, verbose: bool = False
-) -> RefInfo:
-    if ref.startswith("refs/tags/"):
-        return RefInfo(name=slugify(ref[10:]), kind=RefKind.TAG)
-    if ref.startswith("refs/heads/"):
-        return RefInfo(name=slugify(ref[11:]), kind=RefKind.BRANCH)
-    if verbose:
-        click.secho(f"Unrecognized ref format: {ref}", err=True)
-    return RefInfo(name=slugify(ref), kind=RefKind.UNKNOWN)
-
-
 def copy_source_to_target(
     *,
     ctx: click.Context,
     source: Path,
     target: Path,
-    ref: RefInfo,
+    ref: str,
     verbose: bool = False,
 ) -> None:
     target.mkdir(parents=True, exist_ok=True)
-    fullpath = target / ref.name
+    fullpath = target / ref
 
     # Delete any existing directory or file at the target path
     if fullpath.exists():
