@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from click.testing import CliRunner
+
 from unladen import main
 
 
@@ -33,8 +34,18 @@ def test_branch():
     with runner.isolated_filesystem():
         path = make_test_docs()
         result = runner.invoke(
-            main, [str(path), "--target", "test", "--ref", "refs/heads/main"]
+            main,
+            [
+                str(path),
+                "--verbose",
+                "--target",
+                "test",
+                "--ref",
+                "refs/heads/main",
+            ],
         )
+        if result.exit_code:
+            print(result.output)
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -45,8 +56,17 @@ def test_tag():
         path = make_test_docs()
         result = runner.invoke(
             main,
-            [str(path), "--target", "test", "--ref", "refs/tags/v0.1.0"],
+            [
+                str(path),
+                "--verbose",
+                "--target",
+                "test",
+                "--ref",
+                "refs/tags/v0.1.0",
+            ],
         )
+        if result.exit_code:
+            print(result.output)
         assert result.exit_code == 0
         check_test_docs(Path("test"), "v0.1.0")
 
@@ -57,8 +77,17 @@ def test_unknown():
         path = make_test_docs()
         result = runner.invoke(
             main,
-            [str(path), "--target", "test", "--ref", "its/a/version"],
+            [
+                str(path),
+                "--verbose",
+                "--target",
+                "test",
+                "--ref",
+                "its/a/version",
+            ],
         )
+        if result.exit_code:
+            print(result.output)
         assert result.exit_code == 0
         check_test_docs(Path("test"), "its-a-version")
 
@@ -91,6 +120,7 @@ def test_fresh_repo():
                 "refs/heads/main",
             ],
         )
-        print(result.output)
+        if result.exit_code:
+            print(result.output)
         check_test_docs(repo, "main", "gh-pages")
         assert result.exit_code == 0
