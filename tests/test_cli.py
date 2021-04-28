@@ -88,9 +88,9 @@ def test_fresh_repo():
                 "--repo",
                 str(repo.resolve() / ".git"),
                 "--ref",
-                "refs/tags/main",
+                "refs/heads/main",
             ],
         )
         print(result.output)
-        assert result.exit_code == 0
         check_test_docs(repo, "main", "gh-pages")
+        assert result.exit_code == 0
