@@ -17,12 +17,7 @@ def make_test_docs() -> Path:
 
 def check_test_docs(path: Path, ref: str, branch: str = None) -> bool:
     if branch:
-        subprocess.run(
-            ["git", "checkout", branch],
-            cwd=path,
-            capture_output=True,
-            check=True,
-        )
+        subprocess.run(["git", "checkout", branch], cwd=path, check=True)
     assert (path / ref / "index.html").exists()
     with open(path / ref / "index.html", "r") as f:
         assert f.read() == "test"
@@ -30,7 +25,7 @@ def check_test_docs(path: Path, ref: str, branch: str = None) -> bool:
 
 def create_git_repo(path: Path) -> None:
     path.mkdir(parents=True)
-    subprocess.run(["git", "init"], cwd=path, capture_output=True, check=True)
+    subprocess.run(["git", "init"], cwd=path, check=True)
 
 
 def test_branch():
@@ -96,5 +91,5 @@ def test_fresh_repo():
                 "refs/tags/main",
             ],
         )
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         check_test_docs(repo, "main", "gh-pages")
