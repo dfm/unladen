@@ -5,12 +5,26 @@ __all__ = ["main"]
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 import click
 
 from . import config, git, refs
 from .unladen_version import version as __version__
+
+
+def parse_ref_rule(
+    ctx: click.Context, param: click.Option, value: Tuple[str]
+) -> Tuple[refs.Rule]:
+    if value is None:
+        return ()
+    results = []
+    for v in value:
+        values = v.split("=>")
+        if len(values) != 2:
+            raise click.BadOptionUsage("rule", f"Invalid ref rule: {v}")
+        results.append((values[0].strip(), values[1].strip()))
+    return tuple(results)
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -75,6 +89,14 @@ from .unladen_version import version as __version__
     help="Path to the correct git executable.",
     show_default=True,
 )
+@click.option(
+    "--rule",
+    "rules",
+    type=str,
+    multiple=True,
+    callback=parse_ref_rule,
+    help="The rules to map refs to names",
+)
 @click.argument(
     "source",
     type=click.Path(
@@ -113,6 +135,7 @@ def main(
     name: str,
     email: str,
     git_path: str,
+    rules: Tuple[str],
     source: Optional[str],
     config: Optional[str],
 ) -> None:
@@ -132,7 +155,7 @@ def main(
         ref = git.get_ref(
             ctx=ctx, source=source_dir, git=git_path, verbose=verbose
         )
-    parsed_ref = refs.parse_ref(ref=ref, verbose=verbose)
+    parsed_ref = refs.parse_ref(ref=ref, rules=rules, verbose=verbose)
     if not parsed_ref:
         raise click.BadOptionUsage(
             "ref", f"The provided or inferred git ref is invalid: {ref}"

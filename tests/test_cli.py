@@ -54,25 +54,25 @@ def test_tag() -> None:
         check_test_docs(Path("test"), "v0.1.0")
 
 
-def test_unknown() -> None:
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        path = make_test_docs()
-        result = runner.invoke(
-            main,
-            [
-                str(path),
-                "--verbose",
-                "--target",
-                "test",
-                "--ref",
-                "its/a/version",
-            ],
-        )
-        if result.exit_code:
-            print(result.output)
-        assert result.exit_code == 0
-        check_test_docs(Path("test"), "its-a-version")
+# def test_unknown() -> None:
+#     runner = CliRunner()
+#     with runner.isolated_filesystem():
+#         path = make_test_docs()
+#         result = runner.invoke(
+#             main,
+#             [
+#                 str(path),
+#                 "--verbose",
+#                 "--target",
+#                 "test",
+#                 "--ref",
+#                 "its/a/version",
+#             ],
+#         )
+#         if result.exit_code:
+#             print(result.output)
+#         assert result.exit_code == 0
+#         check_test_docs(Path("test"), "its-a-version")
 
 
 def test_invalid_ref() -> None:

@@ -16,7 +16,7 @@ DEFAULT_RULES: List[Rule] = [
 def parse_ref(
     *, ref: str, rules: Optional[Iterable[Rule]] = None, verbose: bool = False
 ) -> Optional[str]:
-    if rules is None:
+    if not rules:
         rules = DEFAULT_RULES
     for pattern, fmt in rules:
         result = re.match(pattern, ref)
