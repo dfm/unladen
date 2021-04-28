@@ -200,7 +200,7 @@ def exec_git(
     cwd: Optional[Path] = None,
     check: bool = True,
     verbose: bool = False,
-) -> subprocess.CompletedProcess[bytes]:
+) -> "subprocess.CompletedProcess[bytes]":
     all_args = [git] + list(args)
     proc = subprocess.run(all_args, cwd=cwd, capture_output=True)
     if verbose:
