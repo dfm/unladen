@@ -200,11 +200,9 @@ def exec_git(
     cwd: Optional[Path] = None,
     check: bool = True,
     verbose: bool = False,
-    **kwargs,
-) -> subprocess.CompletedProcess:
+) -> subprocess.CompletedProcess[bytes]:
     all_args = [git] + list(args)
-    kwargs["capture_output"] = kwargs.get("capture_output", True)
-    proc = subprocess.run(all_args, cwd=cwd, **kwargs)
+    proc = subprocess.run(all_args, cwd=cwd, capture_output=True)
     if verbose:
         msg = f"Running '{' '.join(all_args)}':\n"
         msg += format_command_output(proc.stdout)
