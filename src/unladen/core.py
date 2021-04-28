@@ -6,7 +6,6 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from enum import Enum
-from functools import partial
 from pathlib import Path
 from typing import Optional
 
@@ -27,10 +26,6 @@ class RefKind(Enum):
 class RefInfo:
     name: str
     kind: RefKind
-
-
-out = partial(click.secho, err=True)
-err = partial(click.secho, bold=True, fg="red", err=True)
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -162,7 +157,9 @@ def main(
             "ref", f"The provided or inferred git ref is invalid: {ref}"
         )
     if verbose:
-        out(f"Using git ref: '{parsed_ref.name}' (parsed from '{ref}')")
+        click.secho(
+            f"Using git ref: '{parsed_ref.name}' (parsed from '{ref}')"
+        )
 
     # Get the git SHA
     if not sha:
@@ -170,7 +167,7 @@ def main(
             ctx=ctx, source=source_dir, git=git_path, verbose=verbose
         )
     if verbose and sha:
-        out(f"Current git SHA: '{sha}'")
+        click.secho(f"Current git SHA: '{sha}'")
 
     if repo:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -223,7 +220,7 @@ def parse_ref(
     if ref.startswith("refs/heads/"):
         return RefInfo(name=slugify(ref[11:]), kind=RefKind.BRANCH)
     if verbose:
-        err(f"Unrecognized ref format: {ref}")
+        click.secho(f"Unrecognized ref format: {ref}", err=True)
     return RefInfo(name=slugify(ref), kind=RefKind.UNKNOWN)
 
 
@@ -241,7 +238,7 @@ def copy_source_to_target(
     # Delete any existing directory or file at the target path
     if fullpath.exists():
         if verbose:
-            out(f"{fullpath} exists, overwriting")
+            click.secho(f"{fullpath} exists, overwriting")
         if fullpath.is_dir():
             shutil.rmtree(fullpath)
         else:
