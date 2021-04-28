@@ -232,7 +232,7 @@ def checkout_or_init_repo(
     author: str,
     verbose: bool = False,
 ) -> None:
-    run = partial(subprocess.run, cwd=cwd, capture_output=True)
+    run = partial(subprocess.run, cwd=cwd)
 
     # Initialize the repo and fetch from the remote
     run(["git", "init"], check=True)
@@ -242,11 +242,11 @@ def checkout_or_init_repo(
     )
     if proc.returncode:
         err(f"💔 Couldn't fetch git repo from {repo}")
-        if verbose:
-            err(
-                " -> Full output from `git fetch`:\n\n"
-                f"{proc.stderr.decode('utf-8')}"
-            )
+        # if verbose:
+        #     err(
+        #         " -> Full output from `git fetch`:\n\n"
+        #         f"{proc.stderr.decode('utf-8')}"
+        #     )
         ctx.exit(4)
 
     # Either checkout the right branch or create it
@@ -278,7 +278,7 @@ def push_to_repo(
     force: bool,
     verbose: bool = False,
 ) -> None:
-    run = partial(subprocess.run, cwd=cwd, capture_output=True)
+    run = partial(subprocess.run, cwd=cwd)  # , capture_output=True)
     run(["git", "add", "-A", "."], check=True)
 
     # Check to see if there were any changes
