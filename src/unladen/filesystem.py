@@ -2,8 +2,8 @@
 
 __all__ = ["copy_source_to_target"]
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 import click
 

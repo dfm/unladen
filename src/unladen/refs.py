@@ -3,7 +3,7 @@
 __all__ = ["parse", "DEFAULT_NAME_RULES", "DEFAULT_ALIAS_RULES"]
 
 import re
-from typing import Iterable, Tuple, Optional, List
+from typing import Iterable, List, Optional, Tuple
 
 Rule = Tuple[str, str]
 
