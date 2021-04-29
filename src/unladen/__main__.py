@@ -1,3 +1,3 @@
 from unladen.core import main
 
-main()
+main(prog_name="unladen")
