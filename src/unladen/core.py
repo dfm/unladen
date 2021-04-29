@@ -4,7 +4,7 @@ __all__ = ["main"]
 
 import tempfile
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import click
 
@@ -13,10 +13,11 @@ from .unladen_version import version as __version__
 
 
 def parse_rule(
-    ctx: click.Context, param: click.Option, value: Tuple[str]
-) -> Tuple[refs.Rule]:
-    if value is None:
-        return ()
+    ctx: click.Context,
+    param: Union[click.Parameter, click.Option],
+    value: Tuple[str],
+) -> Tuple[refs.Rule, ...]:
+    value = value if value else ()
     results = []
     for v in value:
         values = v.split("=>")
@@ -142,8 +143,8 @@ def main(
     name: str,
     email: str,
     git_path: str,
-    name_rules: Tuple[str],
-    alias_rules: Tuple[str],
+    name_rules: Tuple[refs.Rule, ...],
+    alias_rules: Tuple[refs.Rule, ...],
     source: Optional[str],
     config: Optional[str],
 ) -> None:

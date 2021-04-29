@@ -24,3 +24,4 @@ def parse(
         result = re.match(pattern, ref)
         if result is not None:
             return fmt.format(*result.groups())
+    return None
