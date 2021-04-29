@@ -19,7 +19,14 @@ force_grid_wrap = 0
 use_parentheses = true
 
 [tool.unladen]
-rules = [
+verbose = true
+repo = "https://github.com/dfm/unladen.git"
+branch = "gh-pages"
+name-rules = [
     "refs/heads/(.+)=>{0}",
     "refs/tags/(.+)=>{0}",
+]
+alias-rules = [
+    "refs/heads/main=>latest",
+    "refs/tags/v[0-9\\.]+=>stable",
 ]

@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["parse_ref"]
+__all__ = ["parse", "DEFAULT_NAME_RULES", "DEFAULT_ALIAS_RULES"]
 
 import re
 from typing import Iterable, Tuple, Optional, List
 
 Rule = Tuple[str, str]
 
-DEFAULT_RULES: List[Rule] = [
+DEFAULT_NAME_RULES: List[Rule] = [
     ("refs/heads/(.+)", "{0}"),
     ("refs/tags/(.+)", "{0}"),
 ]
+DEFAULT_ALIAS_RULES: List[Rule] = [
+    ("refs/heads/main", "latest"),
+    ("refs/tags/v[0-9\\.]+", "stable"),
+]
 
 
-def parse_ref(
-    *, ref: str, rules: Optional[Iterable[Rule]] = None, verbose: bool = False
+def parse(
+    *, ref: str, rules: Iterable[Rule], verbose: bool = False
 ) -> Optional[str]:
-    if not rules:
-        rules = DEFAULT_RULES
     for pattern, fmt in rules:
         result = re.match(pattern, ref)
         if result is not None:

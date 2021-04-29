@@ -2,18 +2,17 @@
 
 __all__ = ["main"]
 
-import shutil
 import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
 
 import click
 
-from . import config, git, refs
+from . import config, filesystem, git, refs
 from .unladen_version import version as __version__
 
 
-def parse_ref_rule(
+def parse_rule(
     ctx: click.Context, param: click.Option, value: Tuple[str]
 ) -> Tuple[refs.Rule]:
     if value is None:
@@ -22,7 +21,7 @@ def parse_ref_rule(
     for v in value:
         values = v.split("=>")
         if len(values) != 2:
-            raise click.BadOptionUsage("rule", f"Invalid ref rule: {v}")
+            raise click.BadOptionUsage("rule", f"Invalid rule: {v}")
         results.append((values[0].strip(), values[1].strip()))
     return tuple(results)
 
@@ -90,12 +89,20 @@ def parse_ref_rule(
     show_default=True,
 )
 @click.option(
-    "--rule",
-    "rules",
+    "--name-rule",
+    "name_rules",
     type=str,
     multiple=True,
-    callback=parse_ref_rule,
+    callback=parse_rule,
     help="The rules to map refs to names",
+)
+@click.option(
+    "--alias-rule",
+    "alias_rules",
+    type=str,
+    multiple=True,
+    callback=parse_rule,
+    help="The rules to map refs to aliases",
 )
 @click.argument(
     "source",
@@ -135,7 +142,8 @@ def main(
     name: str,
     email: str,
     git_path: str,
-    rules: Tuple[str],
+    name_rules: Tuple[str],
+    alias_rules: Tuple[str],
     source: Optional[str],
     config: Optional[str],
 ) -> None:
@@ -150,18 +158,33 @@ def main(
 
     source_dir = Path(source).resolve()
 
-    # First get and parse the git ref
+    # Get or infer git ref
     if not ref:
         ref = git.get_ref(
             ctx=ctx, source=source_dir, git=git_path, verbose=verbose
         )
-    parsed_ref = refs.parse_ref(ref=ref, rules=rules, verbose=verbose)
+
+    # Parse this ref using the provided rules
+    parsed_ref = refs.parse(
+        ref=ref,
+        rules=name_rules if name_rules else refs.DEFAULT_NAME_RULES,
+        verbose=verbose,
+    )
     if not parsed_ref:
         raise click.BadOptionUsage(
             "ref", f"The provided or inferred git ref is invalid: {ref}"
         )
     if verbose:
         click.secho(f"Using git ref: '{parsed_ref}' (parsed from '{ref}')")
+
+    # See if the ref corresponds to an alias
+    alias = refs.parse(
+        ref=ref,
+        rules=alias_rules if alias_rules else refs.DEFAULT_ALIAS_RULES,
+        verbose=verbose,
+    )
+    if verbose and alias:
+        click.secho(f"Alias: '{alias}' (parsed from '{ref}')")
 
     # Get the git SHA
     if not sha:
@@ -173,7 +196,7 @@ def main(
 
     if target:
         target_dir = Path(target).resolve()
-        copy_source_to_target(
+        filesystem.copy_source_to_target(
             ctx=ctx,
             source=source_dir,
             target=target_dir,
@@ -195,7 +218,7 @@ def main(
                 git=git_path,
                 verbose=verbose,
             )
-            copy_source_to_target(
+            filesystem.copy_source_to_target(
                 ctx=ctx,
                 source=source_dir,
                 target=target_dir,
@@ -212,31 +235,3 @@ def main(
                 git=git_path,
                 verbose=verbose,
             )
-
-
-def copy_source_to_target(
-    *,
-    ctx: click.Context,
-    source: Path,
-    target: Path,
-    ref: str,
-    verbose: bool = False,
-) -> None:
-    target.mkdir(parents=True, exist_ok=True)
-    fullpath = target / ref
-
-    # Delete any existing directory or file at the target path
-    if fullpath.exists():
-        if verbose:
-            click.secho(f"{fullpath} exists, overwriting")
-        if fullpath.is_dir():
-            shutil.rmtree(fullpath)
-        else:
-            fullpath.unlink()
-
-    # Do the copy
-    shutil.copytree(source, fullpath)
-
-
-def slugify(value: str) -> str:
-    return value.replace("/", "-")

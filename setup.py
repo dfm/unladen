@@ -14,7 +14,7 @@ CLASSIFIERS = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-INSTALL_REQUIRES = ["beautifulsoup4", "click", "toml"]
+INSTALL_REQUIRES = ["click", "toml", "packaging"]
 EXTRA_REQUIRE = {
     "docs": ["sphinx>=1.7.5", "myst-nb"],
     "test": ["pytest"],
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         package_dir={"": "src"},
         package_data={"unladen": ["py.typed"]},
         include_package_data=True,
-        python_requires=">=3.6",
+        python_requires=">=3.7",
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRA_REQUIRE,
         classifiers=CLASSIFIERS,
