@@ -1,3 +1,5 @@
-from unladen.core import main
+# -*- coding: utf-8 -*-
+
+from unladen.cli import main
 
 main(prog_name="unladen")

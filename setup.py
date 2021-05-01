@@ -14,7 +14,7 @@ CLASSIFIERS = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-INSTALL_REQUIRES = ["click", "toml", "packaging"]
+INSTALL_REQUIRES = ["beautifulsoup4", "click", "packaging", "toml"]
 EXTRA_REQUIRE = {
     "docs": ["sphinx>=1.7.5", "myst-nb"],
     "test": ["pytest"],

@@ -1,0 +1,62 @@
+<div class="unladen-injected injected">
+
+  <div class="rst-versions rst-badge" data-toggle="rst-versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book">&nbsp;</span>
+      v: {{ current_version }}
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+
+      {% block versions %}
+      {% if versions|length >= 1 %}
+      <dl>
+        <dt>Versions</dt>
+        {% for version in versions %}
+        {% if version.verbose_name == current_version %} <strong> {% endif %}
+        <dd><a href="{{ version.get_subdomain_url }}{{ path|default_if_none:"" }}">{{ version.slug }}</a></dd>
+        {% if version.verbose_name == current_version %} </strong> {% endif %}
+        {% endfor %}
+      </dl>
+      {% endif %}
+      {% endblock %}
+
+      {% block vcs %}
+      {% if github_edit_url %}
+      <dl>
+        <dt>On GitHub</dt>
+        <dd>
+          <a href="{{ github_view_url }}">View</a>
+        </dd>
+        {% if version.is_editable %}
+        <dd>
+          <a href="{{ github_edit_url }}">Edit</a>
+        </dd>
+        {% endif %}
+      </dl>
+      {% elif bitbucket_url %}
+      <dl>
+        <dt>On Bitbucket</dt>
+        <dd>
+          <a href="{{ bitbucket_url }}">Edit</a>
+        </dd>
+      </dl>
+      {% elif gitlab_edit_url %}
+      <dl>
+        <dt>On GitLab</dt>
+        <dd>
+          <a href="{{ gitlab_view_url }}">View</a>
+        </dd>
+        {% if version.is_editable %}
+        <dd>
+          <a href="{{ gitlab_edit_url }}">Edit</a>
+        </dd>
+        {% endif %}
+      </dl>
+      {% endif %}
+      {% endblock %}
+
+    </div>
+  </div>
+
+</div>

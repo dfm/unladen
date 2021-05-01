@@ -8,7 +8,7 @@ from typing import Optional, Tuple, Union
 
 import click
 
-from . import config, filesystem, git, refs
+from . import config, filesystem, git, versions
 from .unladen_version import version as __version__
 
 
@@ -16,7 +16,7 @@ def parse_rule(
     ctx: click.Context,
     param: Union[click.Parameter, click.Option],
     value: Tuple[str],
-) -> Tuple[refs.Rule, ...]:
+) -> Tuple[versions.Rule, ...]:
     value = value if value else ()
     results = []
     for v in value:
@@ -90,20 +90,28 @@ def parse_rule(
     show_default=True,
 )
 @click.option(
+    "--version-rule",
+    "version_rules",
+    type=str,
+    multiple=True,
+    callback=parse_rule,
+    help="The rules to map refs to versions.",
+)
+@click.option(
     "--name-rule",
     "name_rules",
     type=str,
     multiple=True,
     callback=parse_rule,
-    help="The rules to map refs to names",
+    help="The rules to map refs to names.",
 )
 @click.option(
-    "--alias-rule",
-    "alias_rules",
+    "--path-rule",
+    "path_rules",
     type=str,
     multiple=True,
     callback=parse_rule,
-    help="The rules to map refs to aliases",
+    help="The rules to map refs to paths.",
 )
 @click.argument(
     "source",
@@ -143,8 +151,9 @@ def main(
     name: str,
     email: str,
     git_path: str,
-    name_rules: Tuple[refs.Rule, ...],
-    alias_rules: Tuple[refs.Rule, ...],
+    version_rules: Tuple[versions.Rule, ...],
+    name_rules: Tuple[versions.Rule, ...],
+    path_rules: Tuple[versions.Rule, ...],
     source: Optional[str],
     config: Optional[str],
 ) -> None:
@@ -166,26 +175,22 @@ def main(
         )
 
     # Parse this ref using the provided rules
-    parsed_ref = refs.parse(
-        ref=ref,
-        rules=name_rules if name_rules else refs.DEFAULT_NAME_RULES,
-        verbose=verbose,
-    )
-    if not parsed_ref:
+    try:
+        version = versions.parse(
+            ref,
+            version_rules=version_rules
+            if version_rules
+            else versions.VERSION_RULES,
+            name_rules=name_rules if name_rules else None,
+            path_rules=path_rules if path_rules else None,
+        )
+    except ValueError:
         raise click.BadOptionUsage(
             "ref", f"The provided or inferred git ref is invalid: {ref}"
         )
-    if verbose:
-        click.secho(f"Using git ref: '{parsed_ref}' (parsed from '{ref}')")
 
-    # See if the ref corresponds to an alias
-    alias = refs.parse(
-        ref=ref,
-        rules=alias_rules if alias_rules else refs.DEFAULT_ALIAS_RULES,
-        verbose=verbose,
-    )
-    if verbose and alias:
-        click.secho(f"Alias: '{alias}' (parsed from '{ref}')")
+    if verbose:
+        click.secho(f"Parsed version '{version.name}' from '{ref}'")
 
     # Get the git SHA
     if not sha:
@@ -201,7 +206,7 @@ def main(
             ctx=ctx,
             source=source_dir,
             target=target_dir,
-            ref=parsed_ref,
+            path=version.path,
             verbose=verbose,
         )
 
@@ -223,7 +228,7 @@ def main(
                 ctx=ctx,
                 source=source_dir,
                 target=target_dir,
-                ref=parsed_ref,
+                path=version.path,
                 verbose=verbose,
             )
             git.push_to_repo(

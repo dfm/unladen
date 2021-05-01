@@ -13,11 +13,11 @@ def copy_source_to_target(
     ctx: click.Context,
     source: Path,
     target: Path,
-    ref: str,
+    path: str,
     verbose: bool = False,
 ) -> None:
     target.mkdir(parents=True, exist_ok=True)
-    fullpath = target / ref
+    fullpath = target / path
 
     # Delete any existing directory or file at the target path
     if fullpath.exists():
