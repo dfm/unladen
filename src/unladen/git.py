@@ -19,7 +19,6 @@ def format_command_output(message: bytes) -> str:
 def exec_git(
     args: Iterable[str],
     *,
-    ctx: click.Context,
     git: str,
     cwd: Optional[Path] = None,
     check: bool = True,
@@ -34,22 +33,21 @@ def exec_git(
     if (verbose or check) and proc.returncode:
         msg = f"Command '{' '.join(all_args)}' failed with message:\n"
         msg += format_command_output(proc.stderr)
-        click.secho(msg, err=True)
         if check:
-            ctx.exit(1)
+            raise RuntimeError(msg)
+        else:
+            click.secho(msg, err=True)
     return proc
 
 
 def get_sha(
     *,
-    ctx: click.Context,
     source: Path,
     git: str,
     verbose: bool = False,
 ) -> Optional[str]:
     proc = exec_git(
         ["rev-parse", "--short", "HEAD"],
-        ctx=ctx,
         git=git,
         cwd=source,
         check=False,
@@ -60,14 +58,12 @@ def get_sha(
 
 def get_ref(
     *,
-    ctx: click.Context,
     source: Path,
     git: str,
     verbose: bool = False,
 ) -> str:
     proc = exec_git(
         ["symbolic-ref", "-q", "HEAD"],
-        ctx=ctx,
         git=git,
         cwd=source,
         check=False,
@@ -76,24 +72,20 @@ def get_ref(
     if proc.returncode:
         proc = exec_git(
             ["describe", "--tags", "--exact-match"],
-            ctx=ctx,
             git=git,
             cwd=source,
             check=False,
             verbose=verbose,
         )
         if proc.returncode:
-            click.secho(
-                "Couldn't infer the git ref; make sure you're in a git repo!",
-                err=True,
+            raise RuntimeError(
+                "Couldn't infer the git ref; make sure you're in a git repo!"
             )
-            ctx.exit(1)
     return proc.stdout.decode("utf-8").strip()
 
 
 def checkout_or_init_repo(
     *,
-    ctx: click.Context,
     repo: str,
     branch: str,
     cwd: Path,
@@ -102,9 +94,7 @@ def checkout_or_init_repo(
     git: str,
     verbose: bool = False,
 ) -> None:
-    run = partial(
-        exec_git, ctx=ctx, cwd=cwd, git=git, verbose=verbose, check=True
-    )
+    run = partial(exec_git, cwd=cwd, git=git, verbose=verbose, check=True)
 
     # Initialize the repo and fetch from the remote
     run(["init"])
@@ -124,7 +114,6 @@ def checkout_or_init_repo(
 
 def push_to_repo(
     *,
-    ctx: click.Context,
     repo: str,
     branch: str,
     cwd: Path,
@@ -133,9 +122,7 @@ def push_to_repo(
     git: str,
     verbose: bool = False,
 ) -> None:
-    run = partial(
-        exec_git, ctx=ctx, cwd=cwd, git=git, verbose=verbose, check=True
-    )
+    run = partial(exec_git, cwd=cwd, git=git, verbose=verbose, check=True)
     run(["add", "-A", "."])
 
     # Check to see if there were any changes

@@ -10,7 +10,6 @@ import click
 
 def copy_source_to_target(
     *,
-    ctx: click.Context,
     source: Path,
     target: Path,
     path: str,

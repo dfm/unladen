@@ -170,9 +170,7 @@ def main(
 
     # Get or infer git ref
     if not ref:
-        ref = git.get_ref(
-            ctx=ctx, source=source_dir, git=git_path, verbose=verbose
-        )
+        ref = git.get_ref(source=source_dir, git=git_path, verbose=verbose)
 
     # Parse this ref using the provided rules
     try:
@@ -188,22 +186,18 @@ def main(
         raise click.BadOptionUsage(
             "ref", f"The provided or inferred git ref is invalid: {ref}"
         )
-
     if verbose:
         click.secho(f"Parsed version '{version.name}' from '{ref}'")
 
     # Get the git SHA
     if not sha:
-        sha = git.get_sha(
-            ctx=ctx, source=source_dir, git=git_path, verbose=verbose
-        )
+        sha = git.get_sha(source=source_dir, git=git_path, verbose=verbose)
     if verbose and sha:
         click.secho(f"Current git SHA: '{sha}'")
 
     if target:
         target_dir = Path(target).resolve()
         filesystem.copy_source_to_target(
-            ctx=ctx,
             source=source_dir,
             target=target_dir,
             path=version.path,
@@ -214,30 +208,36 @@ def main(
         assert repo is not None
         with tempfile.TemporaryDirectory() as temp_dir:
             target_dir = Path(temp_dir)
-            git.checkout_or_init_repo(
-                ctx=ctx,
-                repo=repo,
-                branch=branch,
-                cwd=target_dir,
-                name=name,
-                email=email,
-                git=git_path,
-                verbose=verbose,
-            )
+
+            try:
+                git.checkout_or_init_repo(
+                    repo=repo,
+                    branch=branch,
+                    cwd=target_dir,
+                    name=name,
+                    email=email,
+                    git=git_path,
+                    verbose=verbose,
+                )
+            except RuntimeError as e:
+                click.secho(str(e), err=True)
+
             filesystem.copy_source_to_target(
-                ctx=ctx,
                 source=source_dir,
                 target=target_dir,
                 path=version.path,
                 verbose=verbose,
             )
-            git.push_to_repo(
-                ctx=ctx,
-                repo=repo,
-                branch=branch,
-                cwd=target_dir,
-                sha=sha,
-                force=force,
-                git=git_path,
-                verbose=verbose,
-            )
+
+            try:
+                git.push_to_repo(
+                    repo=repo,
+                    branch=branch,
+                    cwd=target_dir,
+                    sha=sha,
+                    force=force,
+                    git=git_path,
+                    verbose=verbose,
+                )
+            except RuntimeError as e:
+                click.secho(str(e), err=True)
