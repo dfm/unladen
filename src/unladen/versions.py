@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["Version", "parse"]
+__all__ = ["Version", "Database", "parse"]
 
+import json
 import re
+from pathlib import Path
 from typing import (
     Any,
     Dict,
@@ -58,6 +60,37 @@ class Version(NamedTuple):
         return self.version < other.version
 
 
+class Database:
+    def __init__(self, versions: List[Version], aliases: Dict[str, str]):
+        self.versions = versions
+        self.aliases = aliases
+
+    @staticmethod
+    def load(path: Path) -> "Database":
+        with open(path, "r") as f:
+            data = json.load(f)
+        return Database(
+            versions=list(map(Version.load, data.get("versions", []))),
+            aliases=data.get("aliases", {}),
+        )
+
+    def save(self, path: Path) -> None:
+        data = {
+            "versions": [v.save() for v in self.versions],
+            "aliases": self.aliases,
+        }
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2)
+
+    def update_aliases(self, rules: Iterable[Rule] = ALIAS_RULES) -> None:
+        matches: Dict[str, str] = {}
+        for v in sorted(self.versions, reverse=True):
+            name = _parse_ref(v.ref, rules=rules)
+            if name and name not in matches:
+                matches[name] = v.ref
+        self.aliases = matches
+
+
 def parse(
     ref: str,
     *,
@@ -66,11 +99,11 @@ def parse(
     path_rules: Optional[Iterable[Rule]] = None,
     verbose: bool = False,
 ) -> Version:
-    version = parse_ref(ref, rules=version_rules, verbose=verbose)
+    version = _parse_ref(ref, rules=version_rules, verbose=verbose)
     if version is None:
         raise ValueError(f"Invalid parse of 'version' from '{ref}'")
 
-    name = parse_ref(
+    name = _parse_ref(
         ref,
         rules=name_rules if name_rules else version_rules,
         verbose=verbose,
@@ -78,7 +111,7 @@ def parse(
     if name is None:
         raise ValueError(f"Invalid parse of 'name' from '{ref}'")
 
-    path = parse_ref(
+    path = _parse_ref(
         ref,
         rules=path_rules if path_rules else version_rules,
         verbose=verbose,
@@ -86,17 +119,17 @@ def parse(
     if path is None:
         raise ValueError(f"Invalid parse of 'path' from '{ref}'")
 
-    return Version(ref, normalize_version(version), name, path)
+    return Version(ref, _normalize_version(version), name, path)
 
 
-def normalize_version(version: str) -> str:
+def _normalize_version(version: str) -> str:
     try:
         return str(packaging.version.Version(version))
     except packaging.version.InvalidVersion:
         return version
 
 
-def parse_ref(
+def _parse_ref(
     ref: str, *, rules: Iterable[Rule], verbose: bool = False
 ) -> Optional[str]:
     for pattern, fmt in rules:

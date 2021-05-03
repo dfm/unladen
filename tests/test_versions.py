@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import tempfile
+from pathlib import Path
+
 import pytest
 
-from unladen.versions import Version, parse
+from unladen.versions import Database, Version, parse
 
 
 def test_version_load() -> None:
@@ -68,6 +71,41 @@ def test_version_parse_custom() -> None:
     assert version.path == "stable/v0.0.1"
 
 
-def test_invalid_version() -> None:
+def test_version_invalid() -> None:
     with pytest.raises(ValueError):
         parse("un/recognized/ref")
+
+
+def test_database_roundtrip() -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "unladen.json"
+        database = Database(
+            versions=list(map(parse, ["refs/heads/main", "refs/tags/v0.0.1"])),
+            aliases={"stable": "refs/tags/v0.0.1"},
+        )
+        database.save(path)
+        database2 = Database.load(path)
+
+        for v1, v2 in zip(
+            sorted(database.versions), sorted(database2.versions)
+        ):
+            assert v1 == v2
+
+        assert len(database.aliases) == len(database2.aliases)
+        for k, v in database2.aliases.items():
+            assert database.aliases[k] == v
+
+
+def test_update_aliases() -> None:
+    database = Database(
+        versions=list(
+            map(
+                parse,
+                ["refs/heads/main", "refs/tags/v0.0.1", "refs/tags/v0.1.2"],
+            )
+        ),
+        aliases={},
+    )
+    database.update_aliases()
+    assert tuple(database.aliases.keys()) == ("stable",)
+    assert database.aliases["stable"] == "refs/tags/v0.1.2"
