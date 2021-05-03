@@ -8,7 +8,8 @@ from typing import Optional, Tuple, Union
 
 import click
 
-from . import config, filesystem, git, versions
+from . import filesystem, git, versions
+from .config import find_project_root, read_config_toml
 from .unladen_version import version as __version__
 
 
@@ -135,7 +136,7 @@ def parse_rule(
         path_type=str,
     ),
     is_eager=True,
-    callback=config.read_config_toml,
+    callback=read_config_toml,
     help="Read configuration from FILE path.",
 )
 @click.pass_context
@@ -166,11 +167,13 @@ def main(
             "repo", "Either 'repo' or 'target' must be specified"
         )
 
+    project_root = find_project_root((source,))
     source_dir = Path(source).resolve()
+    source_repo = git.Git(project_root, git=git_path, verbose=verbose)
 
     # Get or infer git ref
     if not ref:
-        ref = git.get_ref(source=source_dir, git=git_path, verbose=verbose)
+        ref = source_repo.get_ref()
 
     # Parse this ref using the provided rules
     try:
@@ -191,7 +194,7 @@ def main(
 
     # Get the git SHA
     if not sha:
-        sha = git.get_sha(source=source_dir, git=git_path, verbose=verbose)
+        sha = source_repo.get_sha()
     if verbose and sha:
         click.secho(f"Current git SHA: '{sha}'")
 
@@ -208,16 +211,11 @@ def main(
         assert repo is not None
         with tempfile.TemporaryDirectory() as temp_dir:
             target_dir = Path(temp_dir)
+            target_repo = git.Git(target_dir, git=git_path, verbose=True)
 
             try:
-                git.checkout_or_init_repo(
-                    repo=repo,
-                    branch=branch,
-                    cwd=target_dir,
-                    name=name,
-                    email=email,
-                    git=git_path,
-                    verbose=verbose,
+                target_repo.checkout_or_init_repo(
+                    repo=repo, branch=branch, name=name, email=email
                 )
             except RuntimeError as e:
                 click.secho(str(e), err=True)
@@ -230,14 +228,6 @@ def main(
             )
 
             try:
-                git.push_to_repo(
-                    repo=repo,
-                    branch=branch,
-                    cwd=target_dir,
-                    sha=sha,
-                    force=force,
-                    git=git_path,
-                    verbose=verbose,
-                )
+                target_repo.push_to_branch(branch=branch, sha=sha, force=force)
             except RuntimeError as e:
                 click.secho(str(e), err=True)
