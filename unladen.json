@@ -1,0 +1,14 @@
+{
+  "versions": [
+    {
+      "ref": "refs/heads/main",
+      "version": "main",
+      "name": "main",
+      "path": "main",
+      "active": true
+    }
+  ],
+  "aliases": {
+    "latest": "refs/heads/main"
+  }
+}
