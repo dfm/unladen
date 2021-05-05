@@ -16,7 +16,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "myst_nb",
 ]
-autodoc_mock_imports = []
+master_doc = "index"
+# autodoc_mock_imports = []
 
 project = "unladen"
 copyright = "2021 Dan Foreman-Mackey"
@@ -28,7 +29,9 @@ html_static_path = ["_static"]
 html_theme = "sphinx_book_theme"
 html_title = "unladen"
 html_show_sourcelink = False
-html_baseurl = "https://unladen.readthedocs.io/en/latest/"
+html_baseurl = "https://dfm.io/unladen/"
+html_logo = "_static/layers.svg"
+html_favicon = "_static/layers.png"
 html_theme_options = {
     "path_to_docs": "docs",
     "repository_url": "https://github.com/dfm/unladen",

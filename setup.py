@@ -16,7 +16,7 @@ CLASSIFIERS = [
 ]
 INSTALL_REQUIRES = ["beautifulsoup4", "click", "packaging", "toml"]
 EXTRA_REQUIRE = {
-    "docs": ["sphinx>=1.7.5", "myst-nb"],
+    "docs": ["sphinx>=1.7.5", "myst-nb", "sphinx-book-theme"],
     "test": ["pytest"],
     "lint": ["mypy", "pre-commit"],
 }
