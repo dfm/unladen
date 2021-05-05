@@ -114,6 +114,14 @@ def parse_rule(
     callback=parse_rule,
     help="The rules to map refs to paths.",
 )
+@click.option(
+    "--alias-rule",
+    "alias_rules",
+    type=str,
+    multiple=True,
+    callback=parse_rule,
+    help="The rules to map refs to aliases.",
+)
 @click.argument(
     "source",
     type=click.Path(
@@ -155,6 +163,7 @@ def main(
     version_rules: Tuple[versions.Rule, ...],
     name_rules: Tuple[versions.Rule, ...],
     path_rules: Tuple[versions.Rule, ...],
+    alias_rules: Tuple[versions.Rule, ...],
     source: Optional[str],
     config: Optional[str],
 ) -> None:
@@ -166,6 +175,8 @@ def main(
         raise click.BadOptionUsage(
             "repo", "Either 'repo' or 'target' must be specified"
         )
+
+    print(alias_rules)
 
     project_root = find_project_root((source,))
     source_dir = Path(source).resolve()
@@ -203,7 +214,8 @@ def main(
         filesystem.copy_source_to_target(
             source=source_dir,
             target=target_dir,
-            path=version.path,
+            version=version,
+            alias_rules=alias_rules,
             verbose=verbose,
         )
 
@@ -223,7 +235,8 @@ def main(
             filesystem.copy_source_to_target(
                 source=source_dir,
                 target=target_dir,
-                path=version.path,
+                version=version,
+                alias_rules=alias_rules,
                 verbose=verbose,
             )
 

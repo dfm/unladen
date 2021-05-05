@@ -68,6 +68,7 @@ class Git:
         self.run(["init"])
         self.run(["config", "user.name", name])
         self.run(["config", "user.email", email])
+        self.run(["config", "init.defaultBranch", "main"], check=False)
 
     def checkout_orphan(self, branch: str) -> None:
         self.run(["checkout", "--orphan", branch])

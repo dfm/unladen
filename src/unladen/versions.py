@@ -61,7 +61,9 @@ class Version(NamedTuple):
 
 
 class Database:
-    def __init__(self, versions: List[Version], aliases: Dict[str, str]):
+    def __init__(
+        self, versions: Dict[str, Version] = {}, aliases: Dict[str, str] = {}
+    ):
         self.versions = versions
         self.aliases = aliases
 
@@ -70,25 +72,35 @@ class Database:
         with open(path, "r") as f:
             data = json.load(f)
         return Database(
-            versions=list(map(Version.load, data.get("versions", []))),
+            versions={
+                v.ref: v for v in map(Version.load, data.get("versions", []))
+            },
             aliases=data.get("aliases", {}),
         )
 
     def save(self, path: Path) -> None:
         data = {
-            "versions": [v.save() for v in self.versions],
+            "versions": [v.save() for v in self.versions.values()],
             "aliases": self.aliases,
         }
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
-    def update_aliases(self, rules: Iterable[Rule] = ALIAS_RULES) -> None:
+    def add_version(self, version: Version) -> None:
+        self.versions[version.ref] = version
+
+    def update_aliases(self, rules: Optional[Iterable[Rule]] = None) -> None:
+        if rules is None:
+            rules = ALIAS_RULES
         matches: Dict[str, str] = {}
-        for v in sorted(self.versions, reverse=True):
+        for v in sorted(self.versions.values(), reverse=True):
             name = _parse_ref(v.ref, rules=rules)
             if name and name not in matches:
                 matches[name] = v.ref
         self.aliases = matches
+
+    def __getitem__(self, ref: str) -> Version:
+        return self.versions[ref]
 
 
 def parse(

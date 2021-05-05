@@ -80,7 +80,10 @@ def test_database_roundtrip() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "unladen.json"
         database = Database(
-            versions=list(map(parse, ["refs/heads/main", "refs/tags/v0.0.1"])),
+            versions={
+                v.ref: v
+                for v in map(parse, ["refs/heads/main", "refs/tags/v0.0.1"])
+            },
             aliases={"stable": "refs/tags/v0.0.1"},
         )
         database.save(path)
@@ -98,12 +101,13 @@ def test_database_roundtrip() -> None:
 
 def test_update_aliases() -> None:
     database = Database(
-        versions=list(
-            map(
+        versions={
+            v.ref: v
+            for v in map(
                 parse,
                 ["refs/heads/main", "refs/tags/v0.0.1", "refs/tags/v0.1.2"],
             )
-        ),
+        },
         aliases={},
     )
     database.update_aliases()
