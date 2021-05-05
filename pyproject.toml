@@ -27,6 +27,6 @@ name-rules = [
     "refs/tags/(.+)=>{0}",
 ]
 alias-rules = [
-    "refs/heads/main=>latest",
-    "refs/tags/v[0-9\\.]+=>stable",
+    "^refs/heads/main$=>latest",
+    "^refs/tags/v[0-9\\.]+$=>stable",
 ]

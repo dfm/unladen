@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from unladen.versions import Database, Version, parse
+from unladen.versions import ALIAS_RULES, Database, Version, _parse_ref, parse
 
 
 def test_version_load() -> None:
@@ -113,3 +113,8 @@ def test_update_aliases() -> None:
     database.update_aliases()
     assert tuple(database.aliases.keys()) == ("stable",)
     assert database.aliases["stable"] == "refs/tags/v0.1.2"
+
+
+def test_release_candidate() -> None:
+    assert _parse_ref("refs/tags/v0.1.0", rules=ALIAS_RULES) == "stable"
+    assert _parse_ref("refs/tags/v0.1.0rc1", rules=ALIAS_RULES) is None

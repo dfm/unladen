@@ -19,8 +19,8 @@ from typing import (
 import packaging.version
 
 Rule = Tuple[str, str]
-VERSION_RULES: Tuple[Rule, ...] = (("refs/.+/(.+)", "{0}"),)
-ALIAS_RULES: Tuple[Rule, ...] = (("refs/tags/v[0-9\\.]+", "stable"),)
+VERSION_RULES: Tuple[Rule, ...] = ((r"^refs/.+/(.+)$", "{0}"),)
+ALIAS_RULES: Tuple[Rule, ...] = ((r"^refs/tags/v([0-9\.]+)$", "stable"),)
 
 
 class Version(NamedTuple):
