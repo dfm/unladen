@@ -241,6 +241,8 @@ def main(
             )
 
             try:
-                target_repo.push_to_branch(branch=branch, sha=sha, force=force)
+                target_repo.push_to_repo(
+                    repo=repo, branch=branch, sha=sha, force=force
+                )
             except RuntimeError as e:
                 click.secho(str(e), err=True)

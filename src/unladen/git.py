@@ -103,8 +103,13 @@ class Git:
                 click.secho(f"Checkout of {branch} failed; creating it fresh")
             self.checkout_orphan(branch)
 
-    def push_to_branch(
-        self, branch: str, *, force: bool = False, sha: Optional[str] = None
+    def push_to_repo(
+        self,
+        repo: str,
+        branch: str,
+        *,
+        force: bool = False,
+        sha: Optional[str] = None,
     ) -> None:
         self.run(["add", "-A", "."])
 
@@ -121,7 +126,7 @@ class Git:
         msg = f'"{msg}"'
         if force:
             self.run(["commit", "--amend", "--date=now", "-m", msg])
-            self.run(["push", "-fq", "upstream", f"HEAD:{branch}"])
+            self.run(["push", "-fq", repo, f"HEAD:{branch}"])
         else:
             self.run(["commit", "-m", msg], check=True)
-            self.run(["push", "-q", "upstream", f"HEAD:{branch}"])
+            self.run(["push", "-q", repo, f"HEAD:{branch}"])
