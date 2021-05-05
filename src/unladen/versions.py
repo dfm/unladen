@@ -62,10 +62,12 @@ class Version(NamedTuple):
 
 class Database:
     def __init__(
-        self, versions: Dict[str, Version] = {}, aliases: Dict[str, str] = {}
+        self,
+        versions: Optional[Dict[str, Version]] = None,
+        aliases: Optional[Dict[str, str]] = None,
     ):
-        self.versions = versions
-        self.aliases = aliases
+        self.versions = versions if versions else {}
+        self.aliases = aliases if aliases else {}
 
     @staticmethod
     def load(path: Path) -> "Database":

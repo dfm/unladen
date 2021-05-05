@@ -17,6 +17,7 @@ def test_default_copy() -> None:
                 source=Path(source_dir),
                 target=Path(target_dir),
                 version=versions.parse("refs/heads/main"),
+                verbose=True,
             )
 
         with open(Path(target_dir) / "main" / "test.html", "r") as f:
@@ -32,6 +33,7 @@ def test_correct_alias() -> None:
                 source=Path(v2),
                 target=Path(target_dir),
                 version=versions.parse("refs/tags/v0.2.3"),
+                verbose=True,
             )
 
         with tempfile.TemporaryDirectory() as v1:
@@ -41,6 +43,7 @@ def test_correct_alias() -> None:
                 source=Path(v1),
                 target=Path(target_dir),
                 version=versions.parse("refs/tags/v0.1.0"),
+                verbose=True,
             )
 
         with open(Path(target_dir) / "stable" / "test.html", "r") as f:
