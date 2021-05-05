@@ -28,15 +28,21 @@ class Git:
         self.verbose = verbose
 
     def run(
-        self, args: Iterable[str], *, check: bool = True
+        self,
+        args: Iterable[str],
+        *,
+        check: bool = True,
+        verbose: Optional[bool] = None,
     ) -> "subprocess.CompletedProcess[bytes]":
+        if verbose is None:
+            verbose = self.verbose
         all_args = [self.git] + list(args)
         proc = subprocess.run(all_args, cwd=self.path, capture_output=True)
-        if self.verbose:
+        if verbose:
             msg = f"Running '{' '.join(all_args)}':\n"
             msg += format_command_output(proc.stdout)
             click.secho(msg)
-        if (self.verbose or check) and proc.returncode:
+        if (verbose or check) and proc.returncode:
             msg = f"Command '{' '.join(all_args)}' failed with message:\n"
             msg += format_command_output(proc.stderr)
             if check:

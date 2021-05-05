@@ -33,9 +33,10 @@ jobs:
           python -m sphinx.cmd.build -b dirhtml -d _build/doctrees . _build/dirhtml
 
       - name: Deploy the docs
+        if: github.event_name != 'pull_request'
         run: |
-          python -m unladen --verbose \
+          python -m unladen \
             --ref $GITHUB_REF \
             --sha $GITHUB_SHA \
-            --repo $GITHUB_SERVER_URL/$GITHUB_REPOSITORY \
+            --repo https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY \
             docs/_build/dirhtml
