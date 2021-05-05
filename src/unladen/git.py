@@ -123,7 +123,6 @@ class Git:
             return
 
         msg = f"deploy {sha}" if sha else "deploy docs"
-        msg = f'"{msg}"'
         if force:
             self.run(["commit", "--amend", "--date=now", "-m", msg])
             self.run(["push", "-fq", repo, f"HEAD:{branch}"])
