@@ -40,3 +40,5 @@ jobs:
             --sha $GITHUB_SHA \
             --repo https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY \
             docs/_build/dirhtml
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}

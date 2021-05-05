@@ -176,8 +176,6 @@ def main(
             "repo", "Either 'repo' or 'target' must be specified"
         )
 
-    print(alias_rules)
-
     project_root = find_project_root((source,))
     source_dir = Path(source).resolve()
     source_repo = git.Git(project_root, git=git_path, verbose=verbose)
@@ -246,3 +244,4 @@ def main(
                 )
             except RuntimeError as e:
                 click.secho(str(e), err=True)
+                ctx.exit(1)
