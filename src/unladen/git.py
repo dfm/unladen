@@ -109,7 +109,9 @@ class Git:
         self.run(["add", "-A", "."])
 
         # Check to see if there were any changes
-        proc = self.run(["diff", "--cached", "--exit-code"], check=False)
+        proc = self.run(
+            ["diff", "--cached", "--exit-code"], check=False, verbose=False
+        )
         if proc.returncode == 0:
             if self.verbose:
                 click.secho("Documentation is unchanged; skipping push")
