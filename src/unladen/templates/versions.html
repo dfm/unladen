@@ -3,7 +3,7 @@
   <div class="rst-versions rst-badge" data-toggle="rst-versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       <span class="fa fa-book">&nbsp;</span>
-      v: {{ current_version }}
+      v: {{ current_version.name }}
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
@@ -12,10 +12,17 @@
       {% if versions|length >= 1 %}
       <dl>
         <dt>Versions</dt>
+        {% for (name, version) in aliases %}
+        <dd>{% if version.ref == current_version.ref %} <strong> {% endif %}
+        <a href="{{ base_url }}/{{ version.path }}">{{ name }}</a>
+        {% if version.ref == current_version %} </strong> {% endif %}</dd>
+        {% endfor %}
         {% for version in versions %}
-        {% if version.verbose_name == current_version %} <strong> {% endif %}
-        <dd><a href="{{ version.get_subdomain_url }}{{ path|default_if_none:"" }}">{{ version.slug }}</a></dd>
-        {% if version.verbose_name == current_version %} </strong> {% endif %}
+        {% if version.active %}
+        <dd>{% if version.ref == current_version.ref %} <strong> {% endif %}
+        <a href="{{ base_url }}/{{ version.path }}">{{ version.name }}</a>
+        {% if version.ref == current_version %} </strong> {% endif %}</dd>
+        {% endif %}
         {% endfor %}
       </dl>
       {% endif %}
