@@ -47,5 +47,5 @@ def test_render_versions() -> None:
         current_version=parse("refs/heads/main"),
         base_url="https://dfm.github.io/unladen",
     )
-    # print(template)
+    print(template)
     # assert 0

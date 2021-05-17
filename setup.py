@@ -49,7 +49,7 @@ if __name__ == "__main__":
         long_description_content_type="text/markdown",
         packages=PACKAGES,
         package_dir={"": "src"},
-        package_data={"unladen": ["py.typed"]},
+        package_data={"unladen": ["py.typed", "templates/*.html"]},
         include_package_data=True,
         python_requires=">=3.7",
         install_requires=INSTALL_REQUIRES,
