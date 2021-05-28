@@ -1,461 +1,197 @@
+
 <!DOCTYPE html>
+
 <html>
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-   unladen 🕊️ — unladen
-  </title>
-  <link href="_static/css/theme.css" rel="stylesheet"/>
-  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet"/>
-  <link href="_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
-  <link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
-  <link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
-  <link href="_static/pygments.css" rel="stylesheet" type="text/css">
-   <link href="_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" rel="stylesheet" type="text/css">
-    <link href="_static/togglebutton.css" rel="stylesheet" type="text/css">
-     <link href="_static/mystnb.css" rel="stylesheet" type="text/css"/>
-     <link as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js" rel="preload"/>
-     <script data-url_root="" id="documentation_options" src="_static/documentation_options.js">
-     </script>
-     <script src="_static/jquery.js">
-     </script>
-     <script src="_static/underscore.js">
-     </script>
-     <script src="_static/doctools.js">
-     </script>
-     <script src="_static/togglebutton.js">
-     </script>
-     <script>
-      var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';
-     </script>
-     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js">
-     </script>
-     <link href="https://dfm.io/unladen/index.html" rel="canonical">
-      <link href="_static/layers.png" rel="shortcut icon"/>
-      <link href="genindex/" rel="index" title="Index"/>
-      <link href="search/" rel="search" title="Search"/>
-      <meta content="width=device-width, initial-scale=1" name="viewport"/>
-      <meta content="en" name="docsearch:language"/>
-     </link>
-    </link>
-   </link>
-  </link>
-  <style>
-   /* unladen-injected */
-/* from RTDs badge_only.css */
-.rst-versions.rst-badge {
-  display: block;
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>unladen 🕊️ &#8212; unladen</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
 
-  bottom: 50px;
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-  height: auto;
-}
-.rst-other-versions {
-  text-align: left;
-}
-.rst-other-versions a {
-  border: 0;
-}
-.rst-other-versions dl {
-  margin: 0;
-}
-.rst-content .line-block {
-  margin-bottom: 24px;
-}
-nav.wy-nav-side {
-  padding-bottom: 3em;
-}
-.bookmark-added-msg {
-  display: none;
-}
-.bookmark-active {
-  display: none;
-}
-.bookmark-inactive {
-  display: none;
-}
+    
+      
 
-/* below from RTDs embed.css */
-.fa:before {
-  -webkit-font-smoothing: antialiased;
-}
-.clearfix {
-  *zoom: 1;
-}
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-}
-.clearfix:after {
-  clear: both;
-}
-.fa:before {
-  display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  text-decoration: inherit;
-}
-a .fa {
-  display: inline-block;
-  text-decoration: inherit;
-}
-li .fa {
-  display: inline-block;
-}
-li .fa-large:before,
-li .fa-large:before {
-  width: 1.875em;
-}
-ul.fas {
-  list-style-type: none;
-  margin-left: 2em;
-  text-indent: -0.8em;
-}
-ul.fas li .fa {
-  width: 0.8em;
-}
-ul.fas li .fa-large:before,
-ul.fas li .fa-large:before {
-  vertical-align: baseline;
-}
-/* .fa-book:before {
-  content: "";
-}
-.icon-book:before {
-  content: "";
-}
-.fa-caret-down:before {
-  content: "";
-}
-.icon-caret-down:before {
-  content: "";
-}
-.fa-caret-up:before {
-  content: "";
-}
-.icon-caret-up:before {
-  content: "";
-}
-.fa-caret-left:before {
-  content: "";
-}
-.icon-caret-left:before {
-  content: "";
-}
-.fa-caret-right:before {
-  content: "";
-}
-.icon-caret-right:before {
-  content: "";
-} */
-.rst-versions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 300px;
-  color: #fcfcfc;
-  background: #1f1d1d;
-  font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-  z-index: 400;
-}
-.rst-versions a {
-  color: #2980b9;
-  text-decoration: none;
-}
-.rst-versions .rst-badge-small {
-  display: none;
-}
-.rst-versions .rst-current-version {
-  padding: 12px;
-  background-color: #272525;
-  display: block;
-  text-align: right;
-  font-size: 90%;
-  cursor: pointer;
-  color: #27ae60;
-  *zoom: 1;
-}
-.rst-versions .rst-current-version:before,
-.rst-versions .rst-current-version:after {
-  display: table;
-  content: "";
-}
-.rst-versions .rst-current-version:after {
-  clear: both;
-}
-.rst-versions .rst-current-version .fa {
-  color: #fcfcfc;
-}
-.rst-versions .rst-current-version .fa-book {
-  float: left;
-}
-.rst-versions .rst-current-version .icon-book {
-  float: left;
-}
-.rst-versions .rst-current-version.rst-out-of-date {
-  background-color: #e74c3c;
-  color: #fff;
-}
-.rst-versions .rst-current-version.rst-active-old-version {
-  background-color: #f1c40f;
-  color: #000;
-}
-.rst-versions.shift-up {
-  height: auto;
-  max-height: 100%;
-}
-.rst-versions.shift-up .rst-other-versions {
-  display: block;
-}
-.rst-versions .rst-other-versions {
-  font-size: 90%;
-  padding: 12px;
-  color: gray;
-  display: none;
-}
-.rst-versions .rst-other-versions hr {
-  display: block;
-  height: 1px;
-  border: 0;
-  margin: 20px 0;
-  padding: 0;
-  border-top: solid 1px #413d3d;
-}
-.rst-versions .rst-other-versions dd {
-  display: inline-block;
-  margin: 0;
-}
-.rst-versions .rst-other-versions dd a {
-  display: inline-block;
-  padding: 6px;
-  color: #fcfcfc;
-}
-.rst-versions.rst-badge {
-  width: auto;
-  bottom: 20px;
-  right: 20px;
-  left: auto;
-  border: none;
-  max-width: 300px;
-}
-.rst-versions.rst-badge .icon-book {
-  float: none;
-}
-.rst-versions.rst-badge .fa-book {
-  float: none;
-}
-.rst-versions.rst-badge.shift-up .rst-current-version {
-  text-align: right;
-}
-.rst-versions.rst-badge.shift-up .rst-current-version .fa-book {
-  float: left;
-}
-.rst-versions.rst-badge.shift-up .rst-current-version .icon-book {
-  float: left;
-}
-.rst-versions.rst-badge .rst-current-version {
-  width: auto;
-  height: 30px;
-  line-height: 30px;
-  padding: 0 6px;
-  display: block;
-  text-align: center;
-}
-@media screen and (max-width: 768px) {
-  .rst-versions {
-    width: 85%;
-    display: none;
-  }
-  .rst-versions.shift {
-    display: block;
-  }
-}
-  </style>
- </head>
- <body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
-  <div class="container-fluid" id="banner">
-  </div>
-  <div class="container-xl">
-   <div class="row">
-    <div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
-     <div class="navbar-brand-box">
-      <a class="navbar-brand text-wrap" href="#">
-       <img alt="logo" class="logo" src="_static/layers.svg"/>
-       <h1 class="site-logo" id="site-title">
-        unladen
-       </h1>
-      </a>
-     </div>
-     <form action="search/" class="bd-search d-flex align-items-center" method="get">
-      <i class="icon fas fa-search">
-      </i>
-      <input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
-     </form>
-     <nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
-      <div class="bd-toc-item active">
-      </div>
-     </nav>
-     <!-- To handle the deprecated key -->
-     <div class="navbar_extra_footer">
-      Theme by the
-      <a href="https://ebp.jupyterbook.org">
-       Executable Book Project
-      </a>
-     </div>
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="canonical" href="https://dfm.io/unladen/index.html" />
+    <link rel="shortcut icon" href="_static/layers.png"/>
+    <link rel="index" title="Index" href="genindex/" />
+    <link rel="search" title="Search" href="search/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="#">
+      
+      <img src="_static/layers.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">unladen</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search/" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        
     </div>
-    <main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
-     <div class="topbar container-xl fixed-top">
-      <div class="topbar-contents row">
-       <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
-       </div>
-       <div class="col pl-md-4 topbar-main">
-        <button aria-controls="site-navigation" aria-expanded="true" aria-label="Toggle navigation" class="navbar-toggler ml-0" data-placement="left" data-target=".site-navigation" data-toggle="tooltip" id="navbar-toggler" title="Toggle navigation" type="button">
-         <i class="fas fa-bars">
-         </i>
-         <i class="fas fa-arrow-left">
-         </i>
-         <i class="fas fa-arrow-up">
-         </i>
-        </button>
-        <div class="dropdown-buttons-trigger">
-         <button aria-label="Download this page" class="btn btn-secondary topbarbtn" id="dropdown-buttons-trigger">
-          <i class="fas fa-download">
-          </i>
-         </button>
-         <div class="dropdown-buttons">
-          <!-- ipynb file if we had a myst markdown file -->
-          <!-- Download raw file -->
-          <a class="dropdown-buttons" href="_sources/index.rst.txt">
-           <button class="btn btn-secondary topbarbtn" data-placement="left" data-toggle="tooltip" title="Download source file" type="button">
-            .rst
-           </button>
-          </a>
-          <!-- Download PDF via print -->
-          <button class="btn btn-secondary topbarbtn" data-placement="left" data-toggle="tooltip" id="download-print" onclick="window.print()" title="Print to PDF" type="button">
-           .pdf
-          </button>
-         </div>
-        </div>
-        <!-- Source interaction buttons -->
-        <div class="dropdown-buttons-trigger">
-         <button aria-label="Connect with source repository" class="btn btn-secondary topbarbtn" id="dropdown-buttons-trigger">
-          <i class="fab fa-github">
-          </i>
-         </button>
-         <div class="dropdown-buttons sourcebuttons">
-          <a class="repository-button" href="https://github.com/dfm/unladen">
-           <button class="btn btn-secondary topbarbtn" data-placement="left" data-toggle="tooltip" title="Source repository" type="button">
-            <i class="fab fa-github">
-            </i>
-            repository
-           </button>
-          </a>
-          <a class="issues-button" href="https://github.com/dfm/unladen/issues/new?title=Issue%20on%20page%20%2Findex.html&amp;body=Your%20issue%20content%20here.">
-           <button class="btn btn-secondary topbarbtn" data-placement="left" data-toggle="tooltip" title="Open an issue" type="button">
-            <i class="fas fa-lightbulb">
-            </i>
-            open issue
-           </button>
-          </a>
-          <a class="edit-button" href="https://github.com/dfm/unladen/edit/main/docs/index.rst">
-           <button class="btn btn-secondary topbarbtn" data-placement="left" data-toggle="tooltip" title="Edit this page" type="button">
-            <i class="fas fa-pencil-alt">
-            </i>
-            suggest edit
-           </button>
-          </a>
-         </div>
-        </div>
-        <!-- Full screen (wrap in <a> to have style consistency -->
-        <a class="full-screen-button">
-         <button aria-label="Fullscreen mode" class="btn btn-secondary topbarbtn" data-placement="bottom" data-toggle="tooltip" onclick="toggleFullScreen()" title="Fullscreen mode" type="button">
-          <i class="fas fa-expand">
-          </i>
-         </button>
-        </a>
-        <!-- Launch buttons -->
-       </div>
-       <!-- Table of contents -->
-       <div class="d-none d-md-block col-md-2 bd-toc show">
-       </div>
-      </div>
-     </div>
-     <div class="row" id="main-content">
-      <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-       <div>
-        <div class="section" id="unladen">
-         <h1>
-          unladen 🕊️
-          <a class="headerlink" href="#unladen" title="Permalink to this headline">
-           ¶
-          </a>
-         </h1>
-         <p>
-          <strong>
-           Language agnostic documentation versions
-          </strong>
-         </p>
-        </div>
-       </div>
-       <div class="prev-next-bottom">
-       </div>
-      </div>
-     </div>
-     <footer class="footer mt-5 mt-md-0">
-      <div class="container">
-       <p>
-        © Copyright 2021 Dan Foreman-Mackey.
-        <br/>
-       </p>
-      </div>
-     </footer>
-    </main>
-   </div>
-  </div>
-  <script src="_static/js/index.1c5a1a01449ed65a7b51.js">
-  </script>
-  <div class="unladen-injected injected">
-   <div class="rst-versions rst-badge" data-toggle="rst-versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-     v: main
-     <span class="icon icon-arrow">
-      <svg class="feather feather-chevron-down" fill="none" height="12" stroke="#fcfcfc" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg">
-       <polyline points="6 9 12 15 18 9">
-       </polyline>
-      </svg>
-     </span>
-    </span>
-    <div class="rst-other-versions">
-     <dl>
-      <dt>
-       Versions
-      </dt>
-      <dd>
-       <strong>
-        <a href="https://dfm.io/unladen/main">
-         latest
-        </a>
-       </strong>
-      </dd>
-      <dd>
-       <a href="https://dfm.io/unladen/v0.0.1rc1">
-        v0.0.1rc1
-       </a>
-      </dd>
-      <dd>
-       <strong>
-        <a href="https://dfm.io/unladen/main">
-         main
-        </a>
-       </strong>
-      </dd>
-     </dl>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
-   </div>
-  </div>
- </body>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/dfm/unladen"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/dfm/unladen/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/dfm/unladen/edit/main/docs/index.rst"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="unladen">
+<h1>unladen 🕊️<a class="headerlink" href="#unladen" title="Permalink to this headline">¶</a></h1>
+<p><strong>Language agnostic documentation versions</strong></p>
+</div>
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+            &copy; Copyright 2021 Dan Foreman-Mackey.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
 </html>
