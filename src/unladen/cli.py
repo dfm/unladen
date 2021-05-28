@@ -49,7 +49,7 @@ def parse_rule(
 @click.option(
     "--target",
     type=click.Path(file_okay=False, dir_okay=True),
-    help="The target target directory for the output.",
+    help="The target directory for the output.",
 )
 @click.option(
     "--repo",
@@ -68,6 +68,11 @@ def parse_rule(
     "--base-url",
     type=str,
     help="The base URL of the hosted documentation.",
+)
+@click.option(
+    "--no-version-dropdown",
+    is_flag=True,
+    help="Don't inject the version dropdown into the HTML.",
 )
 @click.option(
     "--force",
@@ -162,6 +167,7 @@ def main(
     repo: Optional[str],
     branch: str,
     base_url: Optional[str],
+    no_version_dropdown: bool,
     force: bool,
     name: str,
     email: str,
@@ -181,6 +187,8 @@ def main(
         raise click.BadOptionUsage(
             "repo", "Either 'repo' or 'target' must be specified"
         )
+    print("base_url", base_url)
+    print("target", target)
 
     project_root = find_project_root((source,))
     source_dir = Path(source).resolve()
@@ -221,6 +229,7 @@ def main(
             version=version,
             base_url=base_url,
             alias_rules=alias_rules,
+            include_version_menu=not no_version_dropdown,
             verbose=verbose,
         )
 
@@ -243,6 +252,7 @@ def main(
                 version=version,
                 base_url=base_url,
                 alias_rules=alias_rules,
+                include_version_menu=not no_version_dropdown,
                 verbose=verbose,
             )
 

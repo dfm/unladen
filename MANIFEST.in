@@ -1,2 +1,3 @@
 prune .github
 include src/unladen/templates/*
+include src/unladen/styles/*

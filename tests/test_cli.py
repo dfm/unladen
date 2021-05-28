@@ -25,6 +25,7 @@ def test_branch() -> None:
                 "test",
                 "--ref",
                 "refs/heads/main",
+                "--no-version-dropdown",
             ],
         )
         if result.exit_code:
@@ -46,6 +47,7 @@ def test_tag() -> None:
                 "test",
                 "--ref",
                 "refs/tags/v0.1.0",
+                "--no-version-dropdown",
             ],
         )
         if result.exit_code:
@@ -81,7 +83,14 @@ def test_invalid_ref() -> None:
         path = make_test_docs()
         result = runner.invoke(
             main,
-            [str(path), "--target", "test", "--ref", "refs/tags/"],
+            [
+                str(path),
+                "--target",
+                "test",
+                "--ref",
+                "refs/tags/",
+                "--no-version-dropdown",
+            ],
         )
         assert result.exit_code
 
@@ -101,6 +110,7 @@ def test_fresh_repo() -> None:
                 str(repo.resolve() / ".git"),
                 "--ref",
                 "refs/heads/main",
+                "--no-version-dropdown",
             ],
         )
         if result.exit_code:
@@ -114,7 +124,9 @@ def test_user_config() -> None:
     with runner.isolated_filesystem():
         path = make_test_docs()
         write_config_file(Path("."), "test.toml")
-        result = runner.invoke(main, ["--config", "test.toml", str(path)])
+        result = runner.invoke(
+            main, ["--config", "test.toml", str(path), "--no-version-dropdown"]
+        )
         if result.exit_code:
             print(result.output)
         assert result.exit_code == 0
@@ -126,7 +138,7 @@ def test_pyproject_config() -> None:
     with runner.isolated_filesystem():
         path = make_test_docs()
         write_config_file(path, "pyproject.toml")
-        result = runner.invoke(main, [str(path)])
+        result = runner.invoke(main, [str(path), "--no-version-dropdown"])
         if result.exit_code:
             print(result.output)
         assert result.exit_code == 0
@@ -138,7 +150,7 @@ def test_unladen_config() -> None:
     with runner.isolated_filesystem():
         path = make_test_docs()
         write_config_file(path, "unladen.toml")
-        result = runner.invoke(main, [str(path)])
+        result = runner.invoke(main, [str(path), "--no-version-dropdown"])
         if result.exit_code:
             print(result.output)
         assert result.exit_code == 0
@@ -159,7 +171,7 @@ def test_global_config() -> None:
         os.environ["XDG_CONFIG_HOME"] = str(cfg)
 
         path = make_test_docs()
-        result = runner.invoke(main, [str(path)])
+        result = runner.invoke(main, [str(path), "--no-version-dropdown"])
         if result.exit_code:
             print(result.output)
         assert result.exit_code == 0

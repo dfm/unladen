@@ -16,7 +16,7 @@ def copy_source_to_target(
     source: Path,
     target: Path,
     version: Version,
-    base_url: str,
+    base_url: Optional[str] = None,
     alias_rules: Optional[Iterable[Rule]] = None,
     include_version_menu: bool = True,
     verbose: bool = False,
@@ -79,8 +79,8 @@ def copy_source_to_target(
             txt = html.inject_into_html(
                 txt, version_style=version_style, version_menu=version_menu
             )
-            with open(filename, "w") as f:
-                f.write(txt)
+    #         with open(filename, "w") as f:
+    #             f.write(txt)
 
 
 def rm_file_or_dir(path: Path, verbose: bool = False) -> None:

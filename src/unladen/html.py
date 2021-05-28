@@ -16,7 +16,7 @@ def render_template(
     *,
     database: Database,
     current_version: Version,
-    base_url: str,
+    base_url: Optional[str] = None,
     **other: Dict[str, str],
 ) -> BeautifulSoup:
     template = Template(
