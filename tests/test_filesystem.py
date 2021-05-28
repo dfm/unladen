@@ -17,6 +17,7 @@ def test_default_copy() -> None:
                 source=Path(source_dir),
                 target=Path(target_dir),
                 version=versions.parse("refs/heads/main"),
+                base_url="http://localhost:5000",
                 verbose=True,
             )
 
@@ -33,6 +34,7 @@ def test_correct_alias() -> None:
                 source=Path(v2),
                 target=Path(target_dir),
                 version=versions.parse("refs/tags/v0.2.3"),
+                base_url="http://localhost:5000",
                 verbose=True,
             )
 
@@ -43,6 +45,7 @@ def test_correct_alias() -> None:
                 source=Path(v1),
                 target=Path(target_dir),
                 version=versions.parse("refs/tags/v0.1.0"),
+                base_url="http://localhost:5000",
                 verbose=True,
             )
 

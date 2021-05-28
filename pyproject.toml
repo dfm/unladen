@@ -20,6 +20,7 @@ use_parentheses = true
 
 [tool.unladen]
 verbose = true
+base-url = "https://dfm.io/unladen"
 repo = "https://github.com/dfm/unladen.git"
 branch = "gh-pages"
 name-rules = [

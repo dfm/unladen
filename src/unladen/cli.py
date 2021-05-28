@@ -65,6 +65,11 @@ def parse_rule(
     show_default=True,
 )
 @click.option(
+    "--base-url",
+    type=str,
+    help="The base URL of the hosted documentation.",
+)
+@click.option(
     "--force",
     is_flag=True,
     help="Force push docs instead of saving history.",
@@ -156,6 +161,7 @@ def main(
     target: Optional[str],
     repo: Optional[str],
     branch: str,
+    base_url: Optional[str],
     force: bool,
     name: str,
     email: str,
@@ -213,6 +219,7 @@ def main(
             source=source_dir,
             target=target_dir,
             version=version,
+            base_url=base_url,
             alias_rules=alias_rules,
             verbose=verbose,
         )
@@ -234,6 +241,7 @@ def main(
                 source=source_dir,
                 target=target_dir,
                 version=version,
+                base_url=base_url,
                 alias_rules=alias_rules,
                 verbose=verbose,
             )
