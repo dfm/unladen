@@ -79,8 +79,8 @@ def copy_source_to_target(
             txt = html.inject_into_html(
                 txt, version_style=version_style, version_menu=version_menu
             )
-    #         with open(filename, "w") as f:
-    #             f.write(txt)
+            with open(filename, "w") as f:
+                f.write(txt)
 
 
 def rm_file_or_dir(path: Path, verbose: bool = False) -> None:
