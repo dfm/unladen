@@ -9,7 +9,7 @@ from typing import Optional
 import pytest
 from click.testing import CliRunner
 
-from unladen import main
+from unladen import cli, main, versions
 
 
 def test_branch() -> None:
@@ -28,8 +28,7 @@ def test_branch() -> None:
                 "--no-version-dropdown",
             ],
         )
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -50,31 +49,9 @@ def test_tag() -> None:
                 "--no-version-dropdown",
             ],
         )
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "v0.1.0")
-
-
-# def test_unknown() -> None:
-#     runner = CliRunner()
-#     with runner.isolated_filesystem():
-#         path = make_test_docs()
-#         result = runner.invoke(
-#             main,
-#             [
-#                 str(path),
-#                 "--verbose",
-#                 "--target",
-#                 "test",
-#                 "--ref",
-#                 "its/a/version",
-#             ],
-#         )
-#         if result.exit_code:
-#             print(result.output)
-#         assert result.exit_code == 0
-#         check_test_docs(Path("test"), "its-a-version")
 
 
 def test_invalid_ref() -> None:
@@ -113,8 +90,7 @@ def test_fresh_repo() -> None:
                 "--no-version-dropdown",
             ],
         )
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(repo, "main", "gh-pages")
 
@@ -127,8 +103,7 @@ def test_user_config() -> None:
         result = runner.invoke(
             main, ["--config", "test.toml", str(path), "--no-version-dropdown"]
         )
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -139,8 +114,7 @@ def test_pyproject_config() -> None:
         path = make_test_docs()
         write_config_file(path, "pyproject.toml")
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -151,8 +125,7 @@ def test_unladen_config() -> None:
         path = make_test_docs()
         write_config_file(path, "unladen.toml")
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -172,8 +145,7 @@ def test_global_config() -> None:
 
         path = make_test_docs()
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        if result.exit_code:
-            print(result.output)
+        assert not result.exception
         assert result.exit_code == 0
         check_test_docs(Path("test"), "main")
 
@@ -181,6 +153,45 @@ def test_global_config() -> None:
             del os.environ["XDG_CONFIG_HOME"]
         else:
             os.environ["XDG_CONFIG_HOME"] = old_cfg_home
+
+
+def test_parse_rule() -> None:
+    rule = cli._parse_rule({"from": "^refs/heads/(.+)$", "to": "{0}"})
+    assert versions._parse_ref("refs/heads/test", rules=[rule]) == "test"
+
+    rule = cli._parse_rule('{"from": "^refs/heads/(.+)$", "to": "{0}"}')
+    assert versions._parse_ref("refs/heads/test", rules=[rule]) == "test"
+
+    rule = cli._parse_rule(
+        {"from": "^refs/tags/v([0-9]+)\\.([0-9]+)\\..*$", "to": "v{0}.{1}"}
+    )
+    assert versions._parse_ref("refs/tags/v0.1.2", rules=[rule]) == "v0.1"
+    assert versions._parse_ref("refs/tags/v0.1.2dev0", rules=[rule]) == "v0.1"
+
+
+def test_cl_rule() -> None:
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        path = make_test_docs()
+        result = runner.invoke(
+            main,
+            [
+                str(path),
+                "--verbose",
+                "--target",
+                "test",
+                "--ref",
+                "refs/tags/v0.1.3",
+                "--version-rule",
+                r'{"from": "^refs/tags/v([0-9]+)\\.([0-9]+)\\..*$", '
+                '"to": "v{0}.{1}"}',
+                "--no-version-dropdown",
+            ],
+        )
+        assert not result.exception
+        assert result.exit_code == 0
+        print(list(Path("test").glob("*")))
+        check_test_docs(Path("test"), "v0.1")
 
 
 def make_test_docs() -> Path:

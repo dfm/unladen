@@ -2,7 +2,9 @@
 
 __all__ = ["main"]
 
+import json
 import tempfile
+from collections import Mapping
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
@@ -13,18 +15,26 @@ from .config import find_project_root, read_config_toml
 from .unladen_version import version as __version__
 
 
+def _parse_rule(value: Union[str, Mapping[str, str]]) -> versions.Rule:
+    if isinstance(value, str):
+        mapping = json.loads(value)
+    else:
+        mapping = value
+    return (str(mapping["from"]).strip(), str(mapping["to"]).strip())
+
+
 def parse_rule(
     ctx: click.Context,
     param: Union[click.Parameter, click.Option],
-    value: Tuple[str],
+    value: Tuple[Union[str, Mapping[str, str]]],
 ) -> Tuple[versions.Rule, ...]:
     value = value if value else ()
     results = []
     for v in value:
-        values = v.split("=>")
-        if len(values) != 2:
-            raise click.BadOptionUsage("rule", f"Invalid rule: {v}")
-        results.append((values[0].strip(), values[1].strip()))
+        try:
+            results.append(_parse_rule(v))
+        except (TypeError, KeyError):
+            raise click.BadOptionUsage(param.name, f"Invalid rule: {v}")
     return tuple(results)
 
 

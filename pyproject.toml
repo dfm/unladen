@@ -23,11 +23,11 @@ verbose = true
 base-url = "https://dfm.io/unladen"
 repo = "https://github.com/dfm/unladen.git"
 branch = "gh-pages"
-name-rules = [
-    "refs/heads/(.+)=>{0}",
-    "refs/tags/(.+)=>{0}",
+version-rules = [
+    {from = "^refs/heads/(.+)$", to = "{0}"},
+    {from = "^refs/tags/v([0-9]+)\\.([0-9]+)\\..*$", to = "v{0}.{1}"}
 ]
 alias-rules = [
-    "^refs/heads/main$=>latest",
-    "^refs/tags/v[0-9\\.]+$=>stable",
+    {from = "^refs/heads/main$", to = "latest"},
+    {from = "^refs/tags/v[0-9\\.]+$", to = "stable"},
 ]
