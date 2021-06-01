@@ -33,7 +33,9 @@ def parse_rule(
         try:
             results.append(_parse_rule(v))
         except (TypeError, KeyError):
-            raise click.BadOptionUsage(param.name, f"Invalid rule: {v}")
+            raise click.BadOptionUsage(
+                param.name if param.name else "rule", f"Invalid rule: {v}"
+            )
     return tuple(results)
 
 
