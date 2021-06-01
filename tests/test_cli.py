@@ -28,8 +28,7 @@ def test_branch() -> None:
                 "--no-version-dropdown",
             ],
         )
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "main")
 
 
@@ -49,8 +48,7 @@ def test_tag() -> None:
                 "--no-version-dropdown",
             ],
         )
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "v0.1.0")
 
 
@@ -90,8 +88,7 @@ def test_fresh_repo() -> None:
                 "--no-version-dropdown",
             ],
         )
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(repo, "main", "gh-pages")
 
 
@@ -103,8 +100,7 @@ def test_user_config() -> None:
         result = runner.invoke(
             main, ["--config", "test.toml", str(path), "--no-version-dropdown"]
         )
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "main")
 
 
@@ -114,8 +110,7 @@ def test_pyproject_config() -> None:
         path = make_test_docs()
         write_config_file(path, "pyproject.toml")
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "main")
 
 
@@ -125,8 +120,7 @@ def test_unladen_config() -> None:
         path = make_test_docs()
         write_config_file(path, "unladen.toml")
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "main")
 
 
@@ -145,8 +139,7 @@ def test_global_config() -> None:
 
         path = make_test_docs()
         result = runner.invoke(main, [str(path), "--no-version-dropdown"])
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         check_test_docs(Path("test"), "main")
 
         if old_cfg_home is None:
@@ -188,8 +181,7 @@ def test_cl_rule() -> None:
                 "--no-version-dropdown",
             ],
         )
-        assert not result.exception
-        assert result.exit_code == 0
+        assert not result.exception, result.output
         print(list(Path("test").glob("*")))
         check_test_docs(Path("test"), "v0.1")
 
@@ -220,10 +212,14 @@ def create_git_repo(path: Path) -> None:
 def write_config_file(path: Path, name: str) -> None:
     with open(path / name, "w") as f:
         f.write(
-            """
+            r"""
 [tool.unladen]
 verbose = true
 target = "test"
 ref = "refs/heads/main"
+version-rule = [
+    {from = "^refs/heads/(.+)$", to = "{0}"},
+    {from = "^refs/tags/v([0-9]+)\\.([0-9]+)\\..*$", to = "v{0}.{1}"}
+]
 """
         )

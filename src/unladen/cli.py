@@ -114,7 +114,7 @@ def parse_rule(
 @click.option(
     "--version-rule",
     "version_rules",
-    type=str,
+    # type=str,
     multiple=True,
     callback=parse_rule,
     help="The rules to map refs to versions.",
@@ -122,7 +122,7 @@ def parse_rule(
 @click.option(
     "--name-rule",
     "name_rules",
-    type=str,
+    # type=str,
     multiple=True,
     callback=parse_rule,
     help="The rules to map refs to names.",
@@ -130,7 +130,7 @@ def parse_rule(
 @click.option(
     "--path-rule",
     "path_rules",
-    type=str,
+    # type=str,
     multiple=True,
     callback=parse_rule,
     help="The rules to map refs to paths.",
@@ -138,7 +138,7 @@ def parse_rule(
 @click.option(
     "--alias-rule",
     "alias_rules",
-    type=str,
+    # type=str,
     multiple=True,
     callback=parse_rule,
     help="The rules to map refs to aliases.",
