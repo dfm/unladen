@@ -15,7 +15,5 @@
       "active": true
     }
   ],
-  "aliases": {
-    "latest": "refs/heads/main"
-  }
+  "aliases": {}
 }
