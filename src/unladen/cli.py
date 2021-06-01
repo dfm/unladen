@@ -4,9 +4,8 @@ __all__ = ["main"]
 
 import json
 import tempfile
-from collections import Mapping
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Mapping, Optional, Tuple, Union
 
 import click
 
